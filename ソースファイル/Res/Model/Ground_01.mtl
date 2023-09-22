@@ -1,0 +1,5 @@
+newmtl ground_kaminky2
+Kd 1 1 1
+map_Kd ground_kaminky2.tga
+illum 2
+

@@ -1,0 +1,5 @@
+newmtl GR_Moss1_AS
+Kd 1 1 1
+map_Kd GR_Moss1_AS.tga
+illum 2
+

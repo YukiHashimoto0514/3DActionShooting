@@ -1,0 +1,4 @@
+newmtl BLD_WindowGlass1_A
+map_Kd BLD_WindowGlass1_A.tga
+illum 2
+

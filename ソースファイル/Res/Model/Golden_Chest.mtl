@@ -1,0 +1,6 @@
+newmtl Tex_Low_TreasureChest_Frugality_Color
+Kd 1 1 1
+map_Kd Tex_Low_TreasureChest_Frugality_Red.tga
+map_Bump Tex_Low_TreasureChest_Frugality_Normal.tga
+illum 2
+

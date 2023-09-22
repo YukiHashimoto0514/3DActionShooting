@@ -1,0 +1,5 @@
+newmtl NAT_Rocks1
+map_Kd NAT_Rocks1_A.tga
+map_Bump NAT_Rocks1_N.tga
+illum 2
+

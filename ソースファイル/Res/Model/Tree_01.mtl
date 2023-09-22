@@ -1,0 +1,13 @@
+newmtl tree_branches
+Kd 0.9698226 1 0.3803922
+Tr 1
+d 0
+map_Kd tree_branches.tga
+illum 2
+
+newmtl bark01_bottom
+Kd 1 1 1
+Ks 0 0 0
+map_Kd bark01_bottom.tga
+illum 2
+

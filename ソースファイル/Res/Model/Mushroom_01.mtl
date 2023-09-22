@@ -1,0 +1,5 @@
+newmtl PP_Standard_Material
+Kd 1 1 1
+map_Kd PP_Color_Palette.tga
+illum 2
+
