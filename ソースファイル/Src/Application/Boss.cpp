@@ -7,19 +7,35 @@
 #include "../Component/DamageSource.h"
 #include "../Component/ARoundMove.h"
 #include "../Application/GameClearScene.h"
+#include "../Component/ParticleSystem.h"
 
 void Boss::Update(float deltaTime)
 {
 	//HPが無くなったら
 	if (this->GetHP() <= 0)
 	{
+		//死んだ時間を計測
+		DeadTimer += deltaTime;
+
 		//フェードが完了したら
 		if (engine->GetFadeState() == Engine::FadeState::Closed)
 		{
 			//クリア！！
 			engine->SetNextScene<GameClearScene>();
 		}
+	}
+
+	//フェード中はここから下は処理しない
+	if (engine->GetFadeState() == Engine::FadeState::Fading)
+	{
 		return;
+	}
+
+	//死んでから2秒たったら
+	if (DeadTimer >= 2.0f)
+	{
+		//フェードアウトを開始
+		engine->StartFadeOut();
 	}
 
 	RoutineUpdate(State, deltaTime);
@@ -30,13 +46,41 @@ void Boss::TakeDamage(GameObject& other, const Damage& damage)
 	//ヒットポイントを減らす
 	this->SetHP(this->GetHP() - damage.amount);
 
+	//現在のHPが半分以下なら
+	if (MaxHP * 0.5f >= this->GetHP())
+	{
+		//攻撃する弾の数を増やす
+		BoxCount = 7;
+	}
+
 	//ヒットポイントが無くなっていたら
 	if (this->GetHP() <= 0)
 	{
-		//フェードアウトを開始
-		engine->StartFadeOut();
+		//パーティクルによる爆発
+		auto ParticleObject = this->engine->Create<GameObject>(
+			"particle explosion", this->GetPos());
+
+		auto ps = ParticleObject->AddComponent<ParticleSystem>();
+		ps->Emitters.resize(1);
+		auto& emitter = ps->Emitters[0];
+		emitter.ep.ImagePath = "Res/exp.tga";
+		emitter.ep.Duration = 0.1f;				//放出時間
+		emitter.ep.RandomizeSize = 1;			//大きさをランダムに
+		emitter.ep.RandomizeRotation = 1;		//角度をつける
+		emitter.ep.RandomizeSize = 1;
+		emitter.ep.EmissionsPerSecond = 30;		//秒間放出数
+		emitter.pp.LifeTime = 3.0f;				//生存時間
+		emitter.pp.color.Set({ 5, 5, 0.5f, 1 }, { 1, 2, 1.5f, 0 });	//色付け
+		emitter.pp.scale.Set({ 0.06f,0.06f }, { 0.005f,0.005f });	//サイズを徐々にへ変更させる
+		//emitter.pp.velocity.Set({ 0,25,0 }, { 0,-20,0 });//上方向に放出
+		emitter.pp.radial.Set(50, -20);
+		emitter.ep.Loop = true;
+
+		return;
 	}
 
+	//エフェクトを出す
+	CreateHitEffect(damage.amount);
 }
 
 
@@ -74,7 +118,7 @@ void Boss::RoutineUpdate(Routine _state,float deltaTime)
 		if (Dis >= MaxDistance)
 		{
 			//最大HPの半分以上なら
-			if (this->GetHP() >= MaxHP / 2)
+			if (this->GetHP() >= MaxHP * 0.5f)
 			{
 				//近づく
 				ChangeState(Routine::MovePlayerPos);
@@ -202,14 +246,14 @@ void Boss::RoutineUpdate(Routine _state,float deltaTime)
 		for (int i = 0; i < BoxCount; i++)
 		{
 			static const float Margine = 5.0f;		//箱どおしの隙間
-			static const int Center = BoxCount / 2;	//何番目が箱の真ん中化を調べる
+			static const float Center = BoxCount / 2.0f;	//何番目が箱の真ん中化を調べる
 
 			GameObjectPtr Box = this->engine->Create<GameObject>("Box");
 
 			auto boxRenderer = Box->AddComponent<MeshRenderer>();
 			boxRenderer->mesh = engine->LoadOBJ("Box");
 			boxRenderer->scale = vec3(1);
-			Box->SetPos(this->GetPos() + Right * (i - Center) * Margine + Forward * 2);//右から順番に生成される
+			Box->SetPos(this->GetPos() + Right * (i - Center) * Margine + Forward * 2.0f);//右から順番に生成される
 			Box->AddPosition({ 0,7,0 });	//上から出てきて欲しい
 			Box->SetMoveFlg(true);			//動く物体
 
@@ -224,8 +268,8 @@ void Boss::RoutineUpdate(Routine _state,float deltaTime)
 			//動きを追加
 			auto bullet = Box->AddComponent<BossCubeBullet>();
 			bullet->SetPlayer(player);			//プレイヤーを設定
-			bullet->SetLiveTime(3.0 + i * 0.5);	//生存時間の設定
-			bullet->SetMoveTime(i * 0.5);		//行動を開始するまでの時間を設定
+			bullet->SetLiveTime(3.0f + i * 0.5f);	//生存時間の設定
+			bullet->SetMoveTime(i * 0.5f);		//行動を開始するまでの時間を設定
 
 			auto damage = Box->AddComponent<DamageSource>();
 			damage->targetName = "player";
@@ -288,5 +332,27 @@ void Boss::ChangeState(Routine _state)
 	}
 
 	State = _state;
+
+}
+
+void Boss::CreateHitEffect(float _count)
+{
+	//ヒットエフェクトの生成
+	auto ParticleObject = this->engine->Create<GameObject>(
+		"particle explosion", this->GetPos());
+
+	auto ps = ParticleObject->AddComponent<ParticleSystem>();
+	ps->Emitters.resize(1);
+	auto& emitter = ps->Emitters[0];
+	emitter.ep.ImagePath = "Res/hit.tga";
+	emitter.ep.tiles = { 3,2 };				//画像枚数
+	emitter.ep.Duration = _count * 0.1f;	//放出時間
+	emitter.ep.RandomizeSize = 1;			//大きさをランダムに
+	emitter.ep.RandomizeRotation = 1;		//角度をつける
+	emitter.ep.EmissionsPerSecond = 10;		//秒間放出数
+	emitter.pp.LifeTime = 0.3f;				//生存時間
+	emitter.pp.color.Set({ 5, 1, 0.5f, 1 }, { 1, 2, 1.5f, 0 });	//色付け
+	emitter.pp.scale.Set({ 0.05f,0.05f }, { 0.005f,0.005f });	//サイズを徐々にへ変更させる
+	emitter.pp.velocity.Set({ 0,1,0 }, { 0,-10,0 });//上方向に放出
 
 }

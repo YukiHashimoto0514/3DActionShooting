@@ -1,19 +1,25 @@
 //@Engine.cpp
 #define _CRT_SECURE_NO_WARNINGS
 #include "Engine.h"
-#include "../Application/MainGameScene.h"
-#include "../Application/TitleScene.h"
-#include "../Application/EasyAudio.h"
-#include "ProgramPipeline.h"
-#include "Texture.h"
 #include "Mesh.h"
 #include "Debug.h"
+#include "Texture.h"
 #include "VertexArray.h"
+#include "ProgramPipeline.h"
+#include "../Application/EasyAudio.h"
+#include "../Application/TitleScene.h"
+#include "../Application/MainGameScene.h"
+#include "../Component/Goal.h"
+#include "../Component/Warp.h"
+#include "../Component/Health.h"
 #include "../Component/Camera.h"
-#include "../Component/MeshRenderer.h"
 #include "../Component/Collider.h"
+#include "../Component/Explosion.h"
 #include "../Component/FallFloor.h"
+#include "../Component/DropPowerUp.h"
 #include "../Component/TreasureBox.h"
+#include "../Component/MeshRenderer.h"
+#include "../Component/ParticleSystem.h"
 
 #undef APIENTRY
 #include <Windows.h>
@@ -62,6 +68,12 @@ struct WorldCollider
 			{
 				Collision::ContactPoint cp;
 
+				//動かない物体同士は判定しない
+				if (!this->gameObject->GetMovable() && !other.gameObject->GetMovable())
+				{
+					continue;
+				}
+
 				//衝突していない
 				if (!Intersect(*ca, *cb, cp))
 				{
@@ -97,7 +109,7 @@ struct WorldCollider
 				
 				//法線で衝突した角度を計算
 				float theta = dot(cp.Normal, vec3(0, 1, 0));
-
+				
 				//大体垂直だったら
 				if (theta <= -0.9f)
 				{
@@ -240,7 +252,7 @@ GameObjectList Engine::LoadGameObjectMap(const char* filename,
 	}
 
 	GameObjectList gameObjectList;
-	gameObjectList.reserve(300);//適当な数を予約
+	gameObjectList.reserve(400);//適当な数を予約
 
 	//行単位で読み込む
 	while (!ifs.eof())
@@ -401,6 +413,69 @@ GameObjectList Engine::LoadGameObjectMap(const char* filename,
 			Gcollider->box.Scale = renderer->scale;
 
 			gameObject->SetMoveFlg(false);
+
+		}
+		else if (Tag == "Goal")
+		{
+			std::string Name = name;
+			gameObject->name = Name;
+
+			//コライダーを割り当てる
+			auto Gcollider = gameObject->AddComponent<BoxCollider>();
+			Gcollider->box.Scale = renderer->scale;
+
+			auto ParticleObject = Create<GameObject>(
+				"particle explosion", gameObject->GetPos());
+			
+
+			auto ps = ParticleObject->AddComponent<ParticleSystem>();
+			ps->Emitters.resize(1);
+			auto& emitter = ps->Emitters[0];
+			emitter.ep.ImagePath = "Res/Last.tga";
+
+			emitter.ep.RandomizeRotation = 1;		//角度をつける
+			emitter.ep.RandomizeDirection = 1;
+			emitter.ep.RandomizeSize = 1;			//大きさをランダムに
+			emitter.ep.Duration = 0.1f;				//放出時間
+			emitter.ep.EmissionsPerSecond = 100;	//秒間放出数
+
+			emitter.pp.LifeTime = 0.4f;				//生存時間
+			emitter.pp.color.Set({ 5, 1, 5.5f, 1 }, { 1, 2, 1.5f, 0 });	//色付け
+			emitter.pp.scale.Set({ 0.3f,0.1f }, { 0.05f,0.02f });	//サイズを徐々にへ変更させる
+
+			emitter.ep.Loop = true;
+			gameObject->SetMoveFlg(false);
+
+		}
+		else if (Tag == "WarpEnter")
+		{
+			std::string Name = name;
+			gameObject->name = name;
+
+			
+			//コライダーを割り当てる
+			auto Gcollider = gameObject->AddComponent<BoxCollider>();
+			Gcollider->box.Scale = renderer->scale;
+			gameObject->SetMoveFlg(false);
+
+		}
+		else if (Tag == "WarpExit")
+		{
+			std::string Name = name;
+			gameObject->name = Name;
+
+		}
+		else if (Tag == "ScareCrow")
+		{
+			gameObject->name = "enemy";
+
+			//コライダーを設定
+			auto collider = gameObject->AddComponent<SphereCollider>();
+			collider->sphere.Center = renderer->translate;
+			collider->sphere.Radius = 1.5f;
+
+			auto hh = gameObject->AddComponent<Health>();		//HP
+			auto ee = gameObject->AddComponent<Explosion>();	//爆発
 
 		}
 		//ゲームオブジェクトを追加
@@ -674,7 +749,7 @@ int Engine::Initialize()
 
 	//3Dモデル用のバッファを作成
 	meshBuffer = Mesh::MeshBuffer::Create(
-		sizeof(Mesh::Vertex) * 250'000, sizeof(uint16_t) * 650'000);
+		sizeof(Mesh::Vertex) * 300'000, sizeof(uint16_t) * 900'000);
 	meshBuffer->CreateBox("Box");
 	meshBuffer->CreateSphere("Sphere");
 	for (int i = 1; i <= 8; ++i)
@@ -696,7 +771,7 @@ int Engine::Initialize()
 	rg.seed(rd());			//疑似乱数を「真の乱数」で初期化
 
 	//パーティクルマネージャーを作成
-	particleManager = ParticleManager::Create(10'000);
+	particleManager = ParticleManager::Create(100'000);
 
 	//ゲームオブジェクト配列の容量を予約
 	gameObjectList.reserve(1000);	//1000分予約した。
@@ -719,7 +794,7 @@ int Engine::Initialize()
 
 
 	//最初のシーンを作成して初期化
-	scene = std::make_shared<MainGameScene>();
+	scene = std::make_shared<TitleScene>();
 	if (scene)
 	{
 		scene->Initialize(*this);
@@ -1005,7 +1080,7 @@ int Engine::MainLoop()
 		//UIレイヤーのスプライト配列を描画
 		for (const auto& layer : uiLayerList)
 		{
-    			DrawSpriteList(layer.spriteList, *layer.tex, spriteSsboOffset);
+			DrawSpriteList(layer.spriteList, *layer.tex, spriteSsboOffset);
 		}
 
 		//シーン遷移エフェクト
@@ -1277,7 +1352,7 @@ void Engine::MakeSpriteList(GameObjectList& gameObjectList, SpriteList& spriteLi
 			s.x += e->GetPos().x;
 			s.y += e->GetPos().y;
 			s.z = e->GetRotation().x;
-			s.w = 1.0f;
+			s.w = e->GetAlpha();
 			s.size = e->GetScale().x;
 			s.red = 1;
 			s.green = 1;
@@ -1328,7 +1403,7 @@ void Engine::DrawStaticMesh(GameObjectList& gameObjectList)
 		float intensity;	//明るさ
 		vec3 direction;		//向き
 	};
-
+	
 	DirectionalLight directionalLight = {
 		vec3(1.0f,0.9f,1.0f),
 		5, 

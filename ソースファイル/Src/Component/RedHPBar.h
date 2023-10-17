@@ -21,19 +21,26 @@ public:
 		//設定されていないなら無視
 		if (GreenBar == NULL)
 		{
+			LOG("参照するオブジェクトを設定してください");
 			return;
 		}
 
+		//HPが比較対象と違ったら
 		if (gameObject.GetHP() != GreenBar->GetHP())
 		{
+			//イージングが完了していなかったら
 			if (TakeTime < 1)
 			{
+				//初めの一度だけ入る
 				if (!isOnce)
 				{
+					//イージングに必要な情報を入力
 					BeforePos = gameObject.GetPos();
 					TargetPos = GreenBar->GetPos();
 					isOnce = true;
 				}
+
+				//イージングを利用して位置を変更する
 				gameObject.SetPos(
 					vec3(BeforePos.x + Circle(TakeTime) * (TargetPos.x - BeforePos.x),
 						BeforePos.y + Circle(TakeTime) * (TargetPos.y - BeforePos.y), 0));
@@ -51,6 +58,7 @@ public:
 		}
 		else
 		{
+			//グリーンバーと同じ位置にする
 			gameObject.SetPos(GreenBar->GetPos());
 		}
 
@@ -66,7 +74,9 @@ private:
 	GameObjectPtr GreenBar;	//付随する緑色のバー
 
 	float TakeTime = 0;		//イージングに使う変数
+
 	bool isOnce = false;	//一度だけ入る
+
 	vec3 BeforePos = vec3(1);	//移動前の座標
 	vec3 TargetPos = vec3(1);	//移動する座標
 };

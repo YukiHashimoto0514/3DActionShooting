@@ -49,6 +49,10 @@ public:
 		}
 	}
 
+	virtual void OnCollision(GameObject& gameObject, GameObject& other)override
+	{
+		gameObject.SetDeadFlg(true);
+	}
 
 	void SetLiveTime(float _time)
 	{
@@ -69,7 +73,7 @@ private:
 
 	VecMath::vec3 forward = VecMath::vec3(0, 0, 1);	//正面
 	float MoveSpeed = 10;	//移動速度
-	float LiveTime = 5;		//生存時間
+	float LiveTime = 30;	//生存時間
 	float MoveTimer = 0;	//行動を開始するまでの時間
 	float Rot = 0;			//回転させる
 

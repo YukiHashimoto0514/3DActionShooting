@@ -1,0 +1,5 @@
+newmtl Basic
+Kd 1 1 1
+map_Kd Basic.tga
+illum 2
+

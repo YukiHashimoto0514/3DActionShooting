@@ -25,11 +25,10 @@ public:
 		auto ps = ParticleObject->AddComponent<ParticleSystem>();
 		ps->Emitters.resize(1);
 		auto& emitter = ps->Emitters[0];
-		emitter.ep.ImagePath = "Res/KP.tga";
+		emitter.ep.ImagePath = "Res/star.tga";
 		emitter.ep.Duration = 0.5f;				//放出時間
 		emitter.ep.EmissionsPerSecond = 30;		//秒間放出数
 		emitter.ep.RandomizeRotation = 1;		//角度ランダム性をつける
-		emitter.ep.RandomizeDirection = 1;		//方向にランダム性を
 		emitter.ep.RandomizeSize = 1;			//大きさをランダムに
 		emitter.pp.rotation.Set(0, radians(720));	//何度まで回転させるか
 		emitter.pp.LifeTime = 1.0f;				//生存時間

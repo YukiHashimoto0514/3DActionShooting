@@ -1,12 +1,13 @@
 //@file GameClearScene.cpp
 
-#include "GameClearScene.h"
-#include "MainGameScene.h"
-#include "../Component/Text.h"
 #include "EasyAudio.h"
-#include "../Engine/AudioSettings.h"
 #include "GameObject.h"
+#include "MainGameScene.h"
+#include "GameClearScene.h"
 #include "../Engine/Engine.h"
+#include "../Engine/AudioSettings.h"
+#include "../Application/TitleScene.h"
+#include "../Component/Text.h"
 #include "../Component/Lerp.h"
 
 //ゲームクリア画面を初期化する
@@ -19,6 +20,7 @@ bool GameClearScene::Initialize(Engine& engine)
 	//ゲームオブジェクトを削除
 	engine.ClearGameObjectList();
 	engine.ClearUILayers();
+	engine.RemoveParticleEmitterAll();
 
 	//UIレイヤーを作成
 	const size_t bgLayer = engine.AddUILayer("Res/title_bg.tga", GL_LINEAR, 10);
@@ -35,6 +37,7 @@ bool GameClearScene::Initialize(Engine& engine)
 		logoLayer, "clear_logo", 660, -600);
 	uiGameClear->AddSprite({ 0,0,1,1 }, 0, 0, 1.25f);
 
+	//線形保管で画面に登場させる
 	auto move = uiGameClear->AddComponent<Lerp>();
 	move->TargetX = 660;
 	move->TargetY = 600;
@@ -56,6 +59,7 @@ bool GameClearScene::Initialize(Engine& engine)
 
 	//フェードインさせる
 	engine.StartFadeIn();
+
 	//BGMを再生
 	Audio::Play(AudioPlayer::bgm, BGM::stageclear, 1, true);
 
@@ -69,42 +73,34 @@ void GameClearScene::Update(Engine& engine, float deltaTime)
 	//経過時間を計測
 	Timer += deltaTime;
 
-
-		if (engine.GetKey(GLFW_KEY_SPACE))
+	//スペースを押したら
+	if (engine.GetKey(GLFW_KEY_SPACE))
+	{
+		//一回もクリックしていなかったら
+		if (!ClickEnter)
 		{
 			Audio::PlayOneShot(SE::Click2, 0.2f);	//効果音を再生
-			engine.SetNextScene<MainGameScene>();		//タイトルシーンに（仮）
+			engine.SetFadeRule("Res/fade_rule2.tga");
+			engine.StartFadeOut();
+			ClickEnter = true;
 		}
+	}
+
+	//フェードアウトが完了したら
+	if (engine.GetFadeState() == Engine::FadeState::Closed && ClickEnter)
+	{
+		engine.SetNextScene<TitleScene>();		//タイトルシーンに
+	}
+
 
 	if (Timer < 2)
 	{
-		//switch (Action)
-		//{
-		//case 0://サイズを変える
-		//	uiGameClear->SetScale(vec3(1 + Smooth(Timer), 1 + Smooth(Timer),1));
-		//	break;
-
-		//case 1://回転させる
-		//	uiGameClear->SetRotation();
-		//	break;
-
-		//case 2://回転しながらサイズを変える
-		//	uiGameClear->Scale = 1 + Smooth(Timer);
-		//	uiGameClear->radias = Smooth(Timer) * 360;
-		//	break;
-
-		//case 3://発光させる
-		//	uiGameClear->Red = 1 + Smooth(Timer);
-		//	uiGameClear->Green = 1 + Smooth(Timer);
-		//	uiGameClear->Blue = 1 + Smooth(Timer);
-		//	break;
-		//}
+		//サイズを変える
+		uiGameClear->SetScale(vec3(1 + Smooth(Timer), 1 + Smooth(Timer), 1));
 	}
 	else if (Timer > 3)
 	{
-		//NextFlg = true;			//次のシーンに移行できるようにする
-		//Timer = 0;				//時間をリセットする
-		//Action = rand() % 4;	//ランダムで動きをきめる
+		Timer = 0;				//時間をリセットする
 	}
 
 

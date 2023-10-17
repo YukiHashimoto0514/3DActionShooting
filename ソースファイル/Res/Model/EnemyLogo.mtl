@@ -1,0 +1,5 @@
+newmtl Enemy
+Kd 1 1 1
+map_Kd Enemy.tga
+illum 2
+

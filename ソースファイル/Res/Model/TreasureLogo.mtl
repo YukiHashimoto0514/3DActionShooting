@@ -1,0 +1,5 @@
+newmtl Treasure
+Kd 1 1 1
+map_Kd Treasure.tga
+illum 2
+

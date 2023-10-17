@@ -1,0 +1,5 @@
+newmtl Stone
+Kd 1 1 1
+map_Kd Stone.tga
+illum 2
+

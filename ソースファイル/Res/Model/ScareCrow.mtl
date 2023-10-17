@@ -1,0 +1,6 @@
+newmtl Drone_Albedo
+Kd 0.5882353 0.5882353 0.5882353
+map_Kd Drone_Albedo.tga
+map_Bump Drone_NormalMap.tga
+illum 2
+

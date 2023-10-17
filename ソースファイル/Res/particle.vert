@@ -62,8 +62,8 @@ void main()
 	v *= particle.Scale;
 
 	//プリミティブを回転
-	gl_Position.y = v.x * particle.sin + v.y * particle.cos;
 	gl_Position.x = v.x * particle.cos - v.y * particle.sin;
+	gl_Position.y = v.x * particle.sin + v.y * particle.cos;
 
 	//プリミティブをカメラ方向に向ける（ビルボード化）
 	gl_Position.z = 0;

@@ -20,6 +20,7 @@ public:
 		//設定されていないなら無視
 		if (player == NULL)
 		{
+			LOG("プレイヤーを設定してください");
 			return;
 		}
 
@@ -57,10 +58,8 @@ private:
 
 	float MaxHP = 0;		//最大HP
 	float NowHP = 0;		//現在のHP
-	int HPScale = 30;		//HPバーの拡縮
-
 	
-	GameObjectPtr player;
+	GameObjectPtr player;	//参照するHP
 
 };
 

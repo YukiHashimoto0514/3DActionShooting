@@ -7,7 +7,7 @@
 #include "../Engine/Debug.h"
 #include "../Engine/Engine.h"
 #include "../Application/GameObject.h"
-#include "../Application/GameClearScene.h"
+#include "../Application/MainGameScene.h"
 
 using namespace VecMath;
 
@@ -18,12 +18,28 @@ public:
 	Goal() = default;				//コンストラクタ
 	virtual ~Goal() = default;		//デストラクタ
 
+	virtual void Update(GameObject& gameObject, float deltaTime)override
+	{
+		//フェードが完了したら
+		if (e->GetFadeState() == Engine::FadeState::Closed)
+		{
+			//メインゲームシーンに遷移する
+			e->SetNextScene<MainGameScene>();
+		}
+	}
+
+
 	virtual void OnCollision(GameObject& gameObject, GameObject& other)override
 	{
 		//ターゲットがゴールまでたどり着いたら
 		if (other.name == target->name)
 		{
-			e->SetNextScene<GameClearScene>();
+
+			//フェードアウトを開始
+			e->SetFadeRule("Res/fade_rule.tga");
+			e->SetFadeColor("Res/fade_color.tga");
+			e->StartFadeOut();	//フェードする
+
 		}
 
 	}

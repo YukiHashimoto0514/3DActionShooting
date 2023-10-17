@@ -1,0 +1,5 @@
+newmtl FullRange_All_01
+Kd 0.588 0.588 0.588
+map_Kd FullRange_All_01.tga
+illum 2
+

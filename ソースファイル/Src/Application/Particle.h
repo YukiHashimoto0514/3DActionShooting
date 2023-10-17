@@ -79,8 +79,8 @@ struct ParticleParameter
 {
 	float LifeTime = 1;//生存時間
 	Texcoord tc = { 0,0,1,1 };//テクスチャ座標
-	Interporator1f radial = Interporator1f(10);				//半径方向の速度
-	Interporator3f velocity = Interporator3f({ 0,0,0 });	//速度
+	Interporator1f radial = Interporator1f(10);				//半径方向の速度(エミッターの中心から放射状に放出したい場合に設定)
+	Interporator3f velocity = Interporator3f({ 0,0,0 });	//速度(特定の向きに放出したい場合に設定)
 	Interporator2f scale = Interporator2f({ 1,1 });			//大きさ
 	Interporator1f rotation = Interporator1f(0);			//回転
 	Interporator4f color = Interporator4f({ 1,1,1,1 });		//色と不透明度
@@ -153,7 +153,8 @@ struct ParticleEmitterParameter
 		struct Box
 		{
 			VecMath::vec3 size = { 1,1,1 };//直方体のサイズ
-		}box = { VecMath::vec3(1) };
+		};
+		Box box = { VecMath::vec3(1) };
 	};
 }; 
 

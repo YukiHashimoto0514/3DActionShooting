@@ -13,7 +13,7 @@ void JumpingEnemy::Update(float deltaTime)
 		CalcForward();	//地上にいる間にプレイヤーを追いかける
 	}
 
-	//ぷにぷに指せる
+	//ぷにぷにさせる
 	vec3 scale = GetScale();
 	scale.y = std::sin(MoveTimer * 5) * 0.2f + 1;
 	SetScale(scale);

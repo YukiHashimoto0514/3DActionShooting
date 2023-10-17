@@ -21,12 +21,12 @@ public:
 
 
 private:
-	float Timer = 0;
+	float Timer = 0;	//イージングで使うタイマー
 
-	int Action = 0;
+	bool ClickEnter = false;	//一度クリックしたかどうか
 
-	GameObjectPtr uiPressSpace;
-	GameObjectPtr uiGameClear;
+	GameObjectPtr uiPressSpace;	//テキストオブジェクト
+	GameObjectPtr uiGameClear;	//イメージオブジェクト
 
 };
 

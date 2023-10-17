@@ -1,0 +1,5 @@
+newmtl xdr99
+Kd 1 1 1
+map_Kd xdr99.tga
+illum 2
+

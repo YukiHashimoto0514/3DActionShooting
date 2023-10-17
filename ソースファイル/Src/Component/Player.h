@@ -16,23 +16,28 @@ public:
 	virtual void Update(float deltaTime)override;
 	virtual void TakeDamage(GameObject& other, const Damage& damage)override;
 
-	float GetShotInterval()
+	int GetShotStyle() const
+	{
+		return ShotStyle;
+	}
+
+	float GetShotInterval() const
 	{
 		return ShotInterval;
 	}
-	float GetMoveSpeed()
+	float GetMoveSpeed() const
 	{
 		return MoveSpeed;
 	}
-	float GetShotDamage()
+	float GetShotDamage() const
 	{
 		return ShotDamage;
 	}
-	bool GetShotGunFlg()
+	bool GetShotGunFlg() const
 	{
 		return ShotGunFlg;
 	}
-	bool GetShooterFlg()
+	bool GetShooterFlg() const
 	{
 		return ShooterFlg;
 	}
@@ -68,12 +73,12 @@ private:
 	float ShotDamage = 1.0f;	//与えるダメージ
 	float JumpTimer = 0;		//ジャンプで使うタイマー
 	float FallTimer = 0;		//落下中に使うタイマー
-	float MoveSpeed = 10.0f;	//移動速度
+	float MoveSpeed = 15.0f ;	//移動速度
 
-	int ShotStyle = 0;	//射撃方法
+	int ShotStyle = 0;			//射撃方法
 
-	bool ShotGunFlg = true;	//ショットガンを使用できるかどうか
-	bool ShooterFlg = true;	//シューターを使用できるかどうか
+	bool ShotGunFlg = false;	//ショットガンを使用できるかどうか
+	bool ShooterFlg = false;	//シューターを使用できるかどうか
 
 	void Jump(float deltaTime);	//ジャンプ処理
 	void Move(float deltaTime);	//移動処理

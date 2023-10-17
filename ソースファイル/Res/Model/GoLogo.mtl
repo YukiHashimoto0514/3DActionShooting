@@ -1,0 +1,5 @@
+newmtl LetsGo
+Kd 1 1 1
+map_Kd LetsGo.tga
+illum 2
+

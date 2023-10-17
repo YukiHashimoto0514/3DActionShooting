@@ -1,29 +1,33 @@
 //@file MainGameScene.h 
 
-#include "MainGameScene.h"
-#include "../Component/MeshRenderer.h"
-#include "../Engine/Collision.h"
-#include "../Component/Collider.h"
-#include "../Engine/Debug.h"
-#include "../Component/Chase.h"
-#include "../Component/DamageSource.h"
-#include "../Component/Player.h"
-#include "../Component/BulletMove.h"
-#include "../Component/Goal.h"
-#include "../Component/Explosion.h"
-#include "../Component/Health.h"
-#include "../Component/MegaExplosion.h"
-#include "../Component/DropPowerUp.h"
-#include "../Application/DeviationEnemy.h"
-#include "../Application/JumpingEnemy.h"
-#include "../Application/Boss.h"
-#include "../Engine/AudioSettings.h"
-#include "../Component/Text.h"
-#include "../Component/UnderBoder.h"
-#include "../Component/TreasureBox.h"
-#include "../Component/HPBar.h"
-#include "../Component/RedHPBar.h"
 #include "EasyAudio.h"
+#include "MainGameScene.h"
+#include "../Engine/Debug.h"
+#include "../Engine/Collision.h"
+#include "../Engine/AudioSettings.h"
+#include "../Application/Boss.h"
+#include "../Application/JumpingEnemy.h"
+#include "../Application/DeviationEnemy.h"
+#include "../Component/Warp.h"
+#include "../Component/Goal.h"
+#include "../Component/Text.h"
+#include "../Component/Chase.h"
+#include "../Component/HPBar.h"
+#include "../Component/Health.h"
+#include "../Component/Player.h"
+#include "../Component/RedHPBar.h"
+#include "../Component/Collider.h"
+#include "../Component/HitEffect.h"
+#include "../Component/Explosion.h"
+#include "../Component/UnderBoder.h"
+#include "../Component/BulletMove.h"
+#include "../Component/DropPowerUp.h"
+#include "../Component/TreasureBox.h"
+#include "../Component/MeshRenderer.h"
+#include "../Component/DamageSource.h"
+#include "../Component/MegaExplosion.h"
+#include "../Component/BossExplosion.h"
+
 using namespace VecMath;
 
 
@@ -33,6 +37,7 @@ bool MainGameScene::Initialize(Engine& engine)
 	//ゲームオブジェクトを削除
 	engine.ClearGameObjectList();
 	engine.ClearUILayers();
+	engine.RemoveParticleEmitterAll();
 
 	//乱数の生成
 	engine.GetRandomGenerator().seed(rd());
@@ -62,6 +67,32 @@ bool MainGameScene::Initialize(Engine& engine)
 	auto  Chest = Treasure->AddComponent<TreasureBox>();
 	Chest->SetTarget(PlayerObj);
 
+	//ワープ（マップ作成中）
+	{
+		////ワープの数（２個１）
+		//const int WarpCount = 2;
+
+		////ワープの設定
+		//for (int i = 0; i < WarpCount; ++i)
+		//{
+		//	//数字を文字列に変換
+		//	std::string No = std::to_string(i);
+		//	std::string EnterName = "WarpEnter";	//入り口の名前
+		//	std::string ExitName = "WarpExit";		//出口の名前
+
+		//	//合体
+		//	EnterName += No;
+		//	ExitName += No;
+
+		//	//ワープオブジェを検索し、対応させる
+		//	auto warp = engine.SearchGameObject(EnterName);
+		//	auto exit = engine.SearchGameObject(ExitName);
+		//	auto enter = warp->AddComponent<Warp>();
+		//	enter->SetExit(exit);
+
+		//}
+	}
+
 	//画面の中心にエイムを表示
 	mouce = engine.AddUILayer("Res/Bullet_1.tga", GL_LINEAR, 10);
 	uimouce = engine.CreateUI<GameObject>(mouce, "aim", 367, 50);
@@ -72,28 +103,63 @@ bool MainGameScene::Initialize(Engine& engine)
 	engine.SetFadeRule("Res/fade_rule3.tga");
 	engine.StartFadeIn();
 
+	//セレクト画像の設定
+	size_t SelectImg = engine.AddUILayer("Res/Select.tga", GL_LINEAR, 10);
+	Select = engine.CreateUI<GameObject>(SelectImg, "select", 0, 300);
+	Select->AddSprite({ 0,0,1,1 });
+	Select->SetPos(vec3{ 70,546,0 });
+	
+	//武器フレーム画像の配置
+	size_t WeaponFrameImg = engine.AddUILayer("Res/WeaponFrame.tga", GL_LINEAR, 10);
+	for (int i = 0; i < 3; i++)
+	{
+		GameObjectPtr WeaponFrame = engine.CreateUI<GameObject>(WeaponFrameImg, "frame", 0, 300);
+		WeaponFrame->AddSprite({ 0,0,1,1 });
+		WeaponFrame->SetPos(vec3{ 70.0f + UIMARGINE * i,546,0 });
+	}
+
+	//ピストル画像の設定
+	size_t PistoleImg = engine.AddUILayer("Res/Pistole.tga", GL_LINEAR, 10);
+	Pistole = engine.CreateUI<GameObject>(PistoleImg, "pistle", 0, 300);
+	Pistole->AddSprite({ 0,0,1,1 });
+	Pistole->SetPos(vec3{ 70,546,0 });
+
+	//アサルト画像の設定
+	size_t AssaultImg = engine.AddUILayer("Res/Assault.tga", GL_LINEAR, 10);
+	Assault = engine.CreateUI<GameObject>(AssaultImg, "assault", 0, 300);
+	Assault->AddSprite({ 0,0,1,1 });
+	Assault->SetPos(vec3{ 220,546,0 });
+	Assault->SetAlpha(0);
+
+	//ショットガン画像の設定
+	size_t ShotGunImg = engine.AddUILayer("Res/ShotGun.tga", GL_LINEAR, 10);
+	ShotGun = engine.CreateUI<GameObject>(ShotGunImg, "shotgun", 0, 300);
+	ShotGun->AddSprite({ 0,0,1,1 });
+	ShotGun->SetPos(vec3{ 370,546,0 });
+	ShotGun->SetAlpha(0);
+
 
 	//赤色のHPバーの設定
 	size_t RedImg = engine.AddUILayer("Res/RedBar.tga", GL_LINEAR, 10);
-	GameObjectPtr RedHPImg = engine.CreateUI<GameObject>(RedImg, "hp", 0, 300);
+	GameObjectPtr RedHPImg = engine.CreateUI<GameObject>(RedImg, "red", 0, 300);
 	RedHPImg->AddSprite({ 0,0,1,1 });
 	RedHPImg->SetPos(vec3{ 0,500,0 });
 
 	//HPバーの設定
 	size_t HPImg = engine.AddUILayer("Res/HPBar.tga", GL_LINEAR, 10);
-	HPBarImg = engine.CreateUI<GameObject>(HPImg, "hp", 0, 300);
+	HPBarImg = engine.CreateUI<GameObject>(HPImg, "green", 0, 300);
 	HPBarImg->AddSprite({ 0,0,1,1 });
 	HPBarImg->SetPos(vec3{ 0,500,0 });
 
 
 	//HPバーの移動
-	auto aaa = HPBarImg->AddComponent<HPBar>();
-	aaa->SetPlayer(PlayerObj);
-	aaa->SetMaxHP(PlayerObj->GetHP());
+	auto barMove = HPBarImg->AddComponent<HPBar>();
+	barMove->SetPlayer(PlayerObj);
+	barMove->SetMaxHP(PlayerObj->GetHP());
 
 	//赤色バーの移動
-	auto bbb = RedHPImg->AddComponent<RedHPBar>();
-	bbb->SetGreenBar(HPBarImg);
+	auto redMove = RedHPImg->AddComponent<RedHPBar>();
+	redMove->SetGreenBar(HPBarImg);
 
 
 	//HPバーフレームの設定
@@ -107,7 +173,7 @@ bool MainGameScene::Initialize(Engine& engine)
 	const size_t textLayer = engine.AddUILayer("Res/font_04_2.tga", GL_NEAREST, 10);
 
 	//制限時間UI
-	auto uiTime = engine.CreateUI<GameObject>(textLayer, "text", 940, 600);
+	auto uiTime = engine.CreateUI<GameObject>(textLayer, "time", 940, 600);
 	TimeManager = uiTime->AddComponent<TimeLimit>();
 	TimeManager->SetTextComponent(uiTime->AddComponent<Text>());	//テキストコンポーネントを入れる
 	
@@ -120,6 +186,7 @@ bool MainGameScene::Initialize(Engine& engine)
 	//コライダーを割り当てる
 	auto Gcollider = UnderGround->AddComponent<BoxCollider>();
 	Gcollider->box.Scale = vec3({ 250,1,350 });
+
 	auto fall = UnderGround->AddComponent<UnderBorder>();
 
 	//BGMを再生
@@ -136,6 +203,9 @@ bool MainGameScene::Initialize(Engine& engine)
 //更新処理
 void MainGameScene::Update(Engine& engine,float deltaTime)
 {
+	//画像等の更新
+	UIUpdate();
+
 	//残り時間が無くなったら
 	if (LimitTime < 0)
 	{
@@ -146,19 +216,19 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 			auto CapsuleRenderer2 = BossObj->AddComponent<MeshRenderer>();
 			CapsuleRenderer2->mesh = engine.LoadOBJ("Capsule2");
 			CapsuleRenderer2->scale = vec3(2);
-			BossObj->SetHP(10);
+			BossObj->SetHP(50);
 
-			auto ex = BossObj->AddComponent<Explosion>();
-			auto h = BossObj->AddComponent<Health>();
+			auto ex = BossObj->AddComponent<BossExplosion>();
 
 			//個別に色を変えるために、マテリアルをコピー
 			CapsuleRenderer2->materials.push_back(
 				std::make_shared<Mesh::Material>(*CapsuleRenderer2->mesh->materials[0]));
 
+			//ダメージを与える対象
+			auto damage = BossObj->AddComponent<DamageSource>();
+			damage->targetName = "player";
 
-			auto t = BossObj->AddComponent<DamageSource>();
-			t->targetName = "player";
-
+			//当たり判定
 			auto capcollider2 = BossObj->AddComponent<CapsuleCollider>();
 			capcollider2->capsule.Seg.Start = vec3(0, 2, 0);
 			capcollider2->capsule.Seg.End = vec3(0, -2, 0);
@@ -167,14 +237,16 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 				CapsuleRenderer2->scale.y,
 				CapsuleRenderer2->scale.z });
 
+			//出現位置
 			BossObj->SetPos({ 10,5,-30 });
 
-
+			//ボスの出現を知らせるフラグ
 			BossShow = true;
 		}
 	}
 	else	//制限時間を減らしていく
 	{
+		//制限時間の適応
 		LimitTime -= deltaTime * engine.SlowSpeed;
 		TimeManager->SetLimitTime(LimitTime);
 	}
@@ -182,14 +254,14 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 	//マウスを取得してカメラを回転させる
 	CameraRot(window, cameraobj, deltaTime, MouceX, MouceY);
 
-	
+	//プレイヤーのアップデート
 	PlayerUpdate(engine, PlayerObj, deltaTime);
 
+	//カメラをプレイヤーに合わせる
 	cameraobj->SetPos(PlayerObj->GetPos());
 
 	//ｙ軸を合わせる
 	PlayerObj->SetRotation(vec3(0,cameraobj->GetRotation().y,0));
-
 
 
 	//ボスが出現したら、雑魚を沸かせない
@@ -198,12 +270,13 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 		return;
 	}
 
-	enemycreate += deltaTime;
+	//エネミーを生成するクールタイム
+	EnemyCreate += deltaTime;
 
-	//3秒に一回敵を生成（雑処理）
-	if (enemycreate >= 3)
+	//残り時間が少ない程大量に生成される
+	if (EnemyCreate >= LimitTime/20)
 	{
-		enemycreate = 0;
+		EnemyCreate = 0;
 
 		//乱数の生成
 		const int rand = std::uniform_int_distribution<>(0, 100)(engine.GetRandomGenerator());//0~100
@@ -213,12 +286,18 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 			auto king = engine.Create<JumpingEnemy>("enemy");
 			king->SetTarget(PlayerObj);
 
+			//ｈPの設定
+			const float hp = std::uniform_real_distribution<float>(50, 100)(engine.GetRandomGenerator());//50~100
+			king->SetHP(hp);
+
+			//モデル描画
 			auto kingRenderer = king->AddComponent<MeshRenderer>();
 			kingRenderer->mesh = engine.LoadOBJ("Res/Model/SlimeKing.obj");
-			
 			kingRenderer->scale = vec3(1);
-			const float x = std::uniform_real_distribution<>(-100, 100)(engine.GetRandomGenerator());//-100~100
-			const float z = std::uniform_real_distribution<>(-100, 100)(engine.GetRandomGenerator());//-100~100
+
+			//出現位置
+			const float x = std::uniform_real_distribution<float>(-100, 100)(engine.GetRandomGenerator());//-100~100
+			const float z = std::uniform_real_distribution<float>(-100, 100)(engine.GetRandomGenerator());//-100~100
 			king->SetPos(vec3(x, 1, z));
 
 			//個別に色を変えるために、マテリアルをコピー
@@ -228,24 +307,24 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 			}
 
 			//本体の色を変える
-			const double r = std::uniform_real_distribution<>(0, 1)(engine.GetRandomGenerator());//0~1
-			const double g = std::uniform_real_distribution<>(0, 1)(engine.GetRandomGenerator());//0~1
-			const double b = std::uniform_real_distribution<>(0, 1)(engine.GetRandomGenerator());//0~1
+			const float r = std::uniform_real_distribution<float>(0, 1)(engine.GetRandomGenerator());//0~1
+			const float g = std::uniform_real_distribution<float>(0, 1)(engine.GetRandomGenerator());//0~1
+			const float b = std::uniform_real_distribution<float>(0, 1)(engine.GetRandomGenerator());//0~1
 			kingRenderer->materials[1]->baseColor = vec4(r, g, b, 1);
 
 
 			//コライダーを割り当てる
-			auto kingcollider = king->AddComponent<SphereCollider>();
-			kingcollider->sphere.Center = kingRenderer->translate;
-			kingcollider->sphere.Radius = std::max({
+			auto kingCollider = king->AddComponent<SphereCollider>();
+			kingCollider->sphere.Center = kingRenderer->translate;
+			kingCollider->sphere.Radius = std::max({
 				kingRenderer->scale.x,
 				kingRenderer->scale.y,
 				kingRenderer->scale.z });
 
 			auto hh = king->AddComponent<Health>();		//HP
 			auto ee = king->AddComponent<Explosion>();	//爆発
-			auto pp = king->AddComponent<DropPowerUp>();	//アイテム
-			pp->target = PlayerObj;
+			auto dp = king->AddComponent<DropPowerUp>();//アイテム
+			dp->target = PlayerObj;
 		}
 		else if(rand>=50)//偏差撃ちをする敵
 		{
@@ -253,15 +332,17 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 			ene->SetTarget(PlayerObj);
 
 			//ｈPの設定
-			ene->SetHP(3);
+			const float hp = std::uniform_real_distribution<float>(2, 4)(engine.GetRandomGenerator());//2~4
+			ene->SetHP(hp);
 
+			//モデル読み込み
 			auto eneRenderer = ene->AddComponent<MeshRenderer>();
 			eneRenderer->mesh = engine.LoadOBJ("Res/Model/Drone_01.obj");
 			eneRenderer->scale = vec3(1);
 
 			//スポーン位置
-			const float x = std::uniform_real_distribution<>(-100, 100)(engine.GetRandomGenerator());//-100~100
-			const float z = std::uniform_real_distribution<>(-100, 100)(engine.GetRandomGenerator());//-100~100
+			const float x = std::uniform_real_distribution<float>(-100, 100)(engine.GetRandomGenerator());//-100~100
+			const float z = std::uniform_real_distribution<float>(-100, 100)(engine.GetRandomGenerator());//-100~100
 			ene->SetPos(vec3(x, 1, z));
 
 			//個別に色を変えるために、マテリアルをコピー
@@ -271,9 +352,9 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 			}
 
 			//本体の色を変える
-			const double r = std::uniform_real_distribution<>(0, 1)(engine.GetRandomGenerator());//0~1
-			const double g = std::uniform_real_distribution<>(0, 1)(engine.GetRandomGenerator());//0~1
-			const double b = std::uniform_real_distribution<>(0, 1)(engine.GetRandomGenerator());//0~1
+			const float r = std::uniform_real_distribution<float>(0, 1)(engine.GetRandomGenerator());//0~1
+			const float g = std::uniform_real_distribution<float>(0, 1)(engine.GetRandomGenerator());//0~1
+			const float b = std::uniform_real_distribution<float>(0, 1)(engine.GetRandomGenerator());//0~1
 			eneRenderer->materials[0]->baseColor = vec4(r, g, b, 1);
 
 
@@ -285,23 +366,30 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 				eneRenderer->scale.y,
 				eneRenderer->scale.z });
 
+			
+			auto he = ene->AddComponent<HitEffect>();	//エフェクト
 			auto hh = ene->AddComponent<Health>();		//HP
 			auto ee = ene->AddComponent<Explosion>();	//爆発
-			auto pp = ene->AddComponent<DropPowerUp>();//アイテム
-			pp->target = PlayerObj;
+			auto dp = ene->AddComponent<DropPowerUp>();	//アイテム
+			dp->target = PlayerObj;
 		}
 		else//スライム
 		{
 			auto ene = engine.Create<JumpingEnemy>("enemy");
 			ene->SetTarget(PlayerObj);
-
+			
+			//ｈPの設定
+			const float hp = std::uniform_real_distribution<float>(2, 3)(engine.GetRandomGenerator());//2~3
+			ene->SetHP(hp);
+			
+			//モデルの読み込み
 			auto eneRenderer = ene->AddComponent<MeshRenderer>();
 			eneRenderer->mesh = engine.LoadOBJ("Res/Model/Slime_02_blender.obj");//ウサギっぽいスライム
 			eneRenderer->scale = vec3(1);
 
 			//スポーン位置
-			const float x = std::uniform_real_distribution<>(-100, 100)(engine.GetRandomGenerator());//-100~100
-			const float z = std::uniform_real_distribution<>(-100, 100)(engine.GetRandomGenerator());//-100~100
+			const float x = std::uniform_real_distribution<float>(-100, 100)(engine.GetRandomGenerator());//-100~100
+			const float z = std::uniform_real_distribution<float>(-100, 100)(engine.GetRandomGenerator());//-100~100
 			ene->SetPos(vec3(x, 1, z));
 
 			//個別に色を変えるために、マテリアルをコピー
@@ -311,9 +399,9 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 			}
 
 			//本体の色を変える
-			const double r = std::uniform_real_distribution<>(0, 1)(engine.GetRandomGenerator());//0~1
-			const double g = std::uniform_real_distribution<>(0, 1)(engine.GetRandomGenerator());//0~1
-			const double b = std::uniform_real_distribution<>(0, 1)(engine.GetRandomGenerator());//0~1
+			const float r = std::uniform_real_distribution<float>(0, 1)(engine.GetRandomGenerator());//0~1
+			const float g = std::uniform_real_distribution<float>(0, 1)(engine.GetRandomGenerator());//0~1
+			const float b = std::uniform_real_distribution<float>(0, 1)(engine.GetRandomGenerator());//0~1
 			eneRenderer->materials[1]->baseColor = vec4(r, g, b, 1);
 
 
@@ -326,6 +414,7 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 				eneRenderer->scale.z });
 
 			auto hh = ene->AddComponent<Health>();			//HP
+			auto co = ene->AddComponent<HitEffect>();		//エフェクト
 			auto ee = ene->AddComponent<MegaExplosion>();	//爆発
 			auto pp = ene->AddComponent<DropPowerUp>();		//アイテム
 			pp->target = PlayerObj;
@@ -340,6 +429,7 @@ void MainGameScene::CameraRot(GLFWwindow* window, GameObjectPtr camera, float de
 {
 	glfwGetCursorPos(window, &MouceX, &MouceY);//XYにマウス位置を格納
 
+	//感度
 	const float scensi = 8.0f;
 
 
@@ -357,11 +447,9 @@ void MainGameScene::CameraRot(GLFWwindow* window, GameObjectPtr camera, float de
 		camera->GetRotation().y,
 		camera->GetRotation().z));
 
-
+	//古い位置を更新
 	oldX = MouceX;
 	oldY = MouceY;
-
-
 }
 
 void MainGameScene::PlayerUpdate(Engine& engine, PlayerPtr player, float deltaTime)
@@ -416,10 +504,6 @@ void MainGameScene::PlayerInit(Engine& engine)
 	//HP
 	PlayerObj->SetHP(5);
 
-	//個別に色を変えるために、マテリアルをコピー
-	CapsuleRenderer->materials.push_back(
-		std::make_shared<Mesh::Material>(*CapsuleRenderer->mesh->materials[0]));
-
 	//カプセルの当たり判定を割り当て
 	auto capcollider = PlayerObj->AddComponent<CapsuleCollider>();
 	capcollider->capsule.Seg.Start = vec3(0, 1, 0);
@@ -432,5 +516,60 @@ void MainGameScene::PlayerInit(Engine& engine)
 	//位置を調整
 	PlayerObj->SetPos({ 0,10,0 });
 	PlayerObj->SetRotation({ 90, 0, -90 });
+}
+
+void MainGameScene::UIUpdate()
+{
+	//一番左の定位置
+	vec3 Pos = vec3{ 70,546,0 };
+
+	switch (PlayerObj->GetShotStyle())
+	{
+	case 0:
+		//セレクト画像を移動させる
+		Select->SetPos(Pos);
+
+		//選択具合で透明度を変える
+		Pistole->SetAlpha(1.0f);
+		Assault->SetAlpha(0.5f);
+		ShotGun->SetAlpha(0.5f);
+		break;
+
+	case 1:
+		//セレクト画像を移動させる
+		Select->SetPos(vec3{ Pos.x + UIMARGINE,Pos.y,Pos.z });
+
+		//選択具合で透明度を変える
+		Pistole->SetAlpha(0.5f);
+		Assault->SetAlpha(1.0f);
+		ShotGun->SetAlpha(0.5f);
+
+		break;
+
+	case 2:
+		//セレクト画像を移動させる
+		Select->SetPos(vec3{ Pos.x + UIMARGINE * 2,Pos.y,Pos.z });
+
+		//選択具合で透明度を変える
+		Pistole->SetAlpha(0.5f);
+		Assault->SetAlpha(0.5f);
+		ShotGun->SetAlpha(1.0f);
+
+		break;
+	default:
+		break;
+	}
+
+	//プレイヤーの武器の取得状況に合わせて透明度を変える
+	if (!PlayerObj->GetShooterFlg())
+	{
+		Assault->SetAlpha(0.0f);
+	}
+	if (!PlayerObj->GetShotGunFlg())
+	{
+		ShotGun->SetAlpha(0.0f);
+	}
+
+
 }
 

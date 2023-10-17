@@ -1,0 +1,5 @@
+newmtl Drop
+Kd 1 1 1
+map_Kd Drop.tga
+illum 2
+

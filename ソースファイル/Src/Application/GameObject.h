@@ -87,8 +87,16 @@ public:
 	{
 		Rotation += rot;
 	}
+	void AddHP(float _hp)
+	{
+		HP += _hp;
+	}
 
-
+	//無敵時間を減らす
+	void DecImmortalTime(float _time)
+	{
+		ImmortalTime -= _time;
+	}
 	
 	int GetPriority() const
 	{
@@ -102,6 +110,10 @@ public:
 	float GetHP() const
 	{
 		return HP;
+	}
+	float GetAlpha() const
+	{
+		return Alpha;
 	}
 
 	const vec3& GetPos() const
@@ -141,7 +153,7 @@ public:
 	{
 		return isAir;
 	}
-
+	
 
 	void SetImmortalTime(float _time)
 	{
@@ -151,6 +163,11 @@ public:
 	{
 		HP = _hp;
 	}
+	void SetAlpha(float _alpha)
+	{
+		Alpha = _alpha;
+	}
+
 	void SetPriority(int _prio)
 	{
 		Priority = _prio;
@@ -208,27 +225,25 @@ public:
 	ComponentList componentList;	//コンポーネント配列
 
 	int only = 0;
-
 	std::vector<ColliderPtr> colliderList;
 private:
 	vec3 Position = { 0,0,0 };	//座標
 	vec3 Forward = { 0,0,0 };	//正面の向き
-	vec3 Right = { 0,0,0 };	//右側の向き
+	vec3 Right = { 0,0,0 };		//右側の向き
 	vec3 Rotation = { 0,0,0 };	//回転
-	vec3 Scale = { 1,1,1 };	//拡大率
+	vec3 Scale = { 1,1,1 };		//拡大率
 
-	float HP = 1;					//体力
+	float HP = 1.0f;				//体力
 	float ImmortalTime = 0;			//無敵時間
-
+	float Alpha = 1.0f;				//画像の透明度
 	int Priority = 0;
 
 	bool isDead = false;			//死亡フラグ
 	bool isStarted = false;			//スタート実行済みフラグ
-	bool isJump = false;
+	bool isJump = false;			//ジャンプできるかどうか(true=できる false=できない)
 	bool isMovable = true;			//移動できるかどうか(true=移動できるfalse=無理)
 	bool PinchFlg = false;			//true=HPが半分より小さい false=HPが半分以上
 	bool isAir = true;				//空中にいるかどうか(true=空なう　false=陸)
-
 
 	RectList collisionList;			//コリジョン配列
 	Rect aabb = { 0,0,0,0 };		//コリジョン境界ボックス(最小の長方形)

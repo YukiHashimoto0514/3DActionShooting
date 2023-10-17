@@ -4,11 +4,8 @@
 #include "../Component/MeshRenderer.h"
 #include "../Component/Collider.h"
 #include "../Component/DamageSource.h"
-//
-//void Player::Start()
-//{
-//	LOG("doumo");
-//}
+#include "../Application/EasyAudio.h"
+#include "../Engine/AudioSettings.h"
 
 void Player::Update(float deltaTime)
 {
@@ -30,10 +27,22 @@ void Player::Update(float deltaTime)
 
 	Fall(deltaTime);
 
+	//無敵時間を減らす
+	if (this->GetImmortalTime() > 0)
+	{
+		this->DecImmortalTime(deltaTime);
+	}
+	else
+	{
+		this->SetImmortalTime(0);
+	}
+
+	//~~雑実装~~\\
+	
 	//通常攻撃にする
 	if (engine->GetKey(GLFW_KEY_1))
 	{
-		ShotStyle = 1;
+		ShotStyle = 0;
 	}
 
 	//シューターが使えるようになっていたら
@@ -59,20 +68,26 @@ void Player::Update(float deltaTime)
 
 void Player::TakeDamage(GameObject& other, const Damage& damage)
 {
-
-	//ヒットポイントを減らす
-	this->SetHP(this->GetHP() - damage.amount);
-
-	//ヒットポイントが無くなっていたら
-	if (this->GetHP() <= 0)
+	//無敵時間がないなら
+	if (this->GetImmortalTime() <= 0)
 	{
-		//フェードアウトを開始
-		engine->SetFadeRule("Res/fade_rule4.tga");
-		engine->SetFadeColor("Res/fade_colorR.tga");
-		engine->StartFadeOut(2.0f);	//2秒かけてフェードする
-		
-		//自身の当たり判定を消す
-		this->colliderList.clear();
+		//ヒットポイントを減らす
+		this->SetHP(this->GetHP() - damage.amount);
+
+		//無敵時間をセット
+		this->SetImmortalTime(2.0f);
+
+		//ヒットポイントが無くなっていたら
+		if (this->GetHP() <= 0)
+		{
+			//フェードアウトを開始
+			engine->SetFadeRule("Res/fade_rule4.tga");
+			engine->SetFadeColor("Res/fade_colorR.tga");
+			engine->StartFadeOut(2.0f);	//2秒かけてフェードする
+
+			//自身の当たり判定を消す
+			this->colliderList.clear();
+		}
 	}
 }
 
@@ -147,6 +162,7 @@ void Player::Shot(float deltaTime)
 {
 	//射撃クールタイムを減らす
 	ShotCoolTime -= deltaTime;
+	
 
 	//マウスの左クリック
 	int state = glfwGetMouseButton(engine->GetWindow(), GLFW_MOUSE_BUTTON_LEFT);
@@ -158,6 +174,9 @@ void Player::Shot(float deltaTime)
 			//何もせん
 			return;
 		}
+
+		//射撃音を鳴らす
+		Audio::PlayOneShot(SE::playerShot, 0.2f);
 
 		switch (ShotStyle)
 		{
@@ -180,9 +199,9 @@ void Player::Shot(float deltaTime)
 				std::make_shared<Mesh::Material>(*bulletRenderer->mesh->materials[0]));
 
 			//当たり判定の設定
-			auto bulletcollider = bullet->AddComponent<SphereCollider>();
-			bulletcollider->sphere.Center = bulletRenderer->translate;
-			bulletcollider->sphere.Radius = std::max({
+			auto bulletCollider = bullet->AddComponent<SphereCollider>();
+			bulletCollider->sphere.Center = bulletRenderer->translate;
+			bulletCollider->sphere.Radius = std::max({
 				bulletRenderer->scale.x,
 				bulletRenderer->scale.y,
 				bulletRenderer->scale.z });
@@ -190,8 +209,7 @@ void Player::Shot(float deltaTime)
 			//ダメージを与える相手の設定
 			auto da = bullet->AddComponent<DamageSource>();
 			da->targetName = "enemy";
-			da->amount = ShotDamage;
-			da->isOnce = true;
+			da->amount = ShotDamage * 2.0f;	//ダメージ調整
 
 			break;
 		}
@@ -204,6 +222,7 @@ void Player::Shot(float deltaTime)
 			auto move = bullet->AddComponent<BulletMove>();
 			move->SetPlayerinfo(this, *bullet);
 			move->SetRandom(true);
+			
 			//見た目の設定
 			auto bulletRenderer = bullet->AddComponent<MeshRenderer>();
 			bulletRenderer->mesh = engine->LoadOBJ("Sphere");
@@ -214,9 +233,9 @@ void Player::Shot(float deltaTime)
 				std::make_shared<Mesh::Material>(*bulletRenderer->mesh->materials[0]));
 
 			//当たり判定の設定
-			auto bulletcollider = bullet->AddComponent<SphereCollider>();
-			bulletcollider->sphere.Center = bulletRenderer->translate;
-			bulletcollider->sphere.Radius = std::max({
+			auto bulletCollider = bullet->AddComponent<SphereCollider>();
+			bulletCollider->sphere.Center = bulletRenderer->translate;
+			bulletCollider->sphere.Radius = std::max({
 				bulletRenderer->scale.x,
 				bulletRenderer->scale.y,
 				bulletRenderer->scale.z });
@@ -251,9 +270,9 @@ void Player::Shot(float deltaTime)
 					std::make_shared<Mesh::Material>(*bulletRenderer->mesh->materials[0]));
 
 				//当たり判定の設定
-				auto bulletcollider = bullet->AddComponent<SphereCollider>();
-				bulletcollider->sphere.Center = bulletRenderer->translate;
-				bulletcollider->sphere.Radius = std::max({
+				auto bulletCollider = bullet->AddComponent<SphereCollider>();
+				bulletCollider->sphere.Center = bulletRenderer->translate;
+				bulletCollider->sphere.Radius = std::max({
 					bulletRenderer->scale.x,
 					bulletRenderer->scale.y,
 					bulletRenderer->scale.z });
@@ -261,7 +280,7 @@ void Player::Shot(float deltaTime)
 				//ダメージを与える相手の設定
 				auto da = bullet->AddComponent<DamageSource>();
 				da->targetName = "enemy";
-				da->amount = ShotDamage;
+				da->amount = ShotDamage * 0.8f;	//ダメージを調整
 				da->isOnce = true;
 			}
 			break;

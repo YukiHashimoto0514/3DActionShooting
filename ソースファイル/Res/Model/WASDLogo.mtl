@@ -1,0 +1,5 @@
+newmtl WASD
+Kd 1 1 1
+map_Kd WASD.tga
+illum 2
+

@@ -24,12 +24,17 @@ public:
 		//乱数を使用するなら
 		if (Randamness)
 		{
-			forward.x += static_cast<float>(std::clamp(
-				std::normal_distribution<>(0, 0.1f)(rd), -0.2, 0.2));	//大体０付近の乱数
+			forward.x += std::clamp(
+				std::normal_distribution<float>(0, 0.1f)(rd), -0.1f, 0.1f);	//大体０付近の乱数
 
-			forward.y += static_cast<float>(
-				std::clamp(std::normal_distribution<>(0, 0.1f)(rd), -0.1, 0.1));	//大体０付近の乱数
+			forward.y += std::clamp(
+				std::normal_distribution<float>(0, 0.1f)(rd), -0.1f, 0.1f);	//大体０付近の乱数
+
+			forward.z += std::clamp(
+				std::normal_distribution<float>(0, 0.1f)(rd), -0.1f, 0.1f);	//大体０付近の乱数
 		}
+
+
 	}
 
 	//何に当たっても弾は壊れる

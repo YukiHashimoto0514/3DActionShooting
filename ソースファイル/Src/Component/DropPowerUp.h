@@ -6,6 +6,7 @@
 #include "../Application/GameObject.h"
 #include "../Component/Player.h"
 #include "../Component/Collider.h"
+#include "../Engine/Engine.h"
 #include "../Application/ItemObject.h"
 
 //プレイヤーを強化するコンポーネント
@@ -38,7 +39,7 @@ public:
 	}
 
 	PlayerPtr target;	//強化対象
-
+	Engine engine;
 	const int Red = 0;
 	const int Green = 1;
 	const int Blue = 2;

@@ -1,0 +1,5 @@
+newmtl LongJump
+Kd 1 1 1
+map_Kd LongJump.tga
+illum 2
+

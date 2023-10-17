@@ -9,6 +9,13 @@
 
 using namespace VecMath;
 
+//どっちを選択しているか
+enum class Select
+{
+	Tutorial,	//チュートリアル
+	Game,		//メインゲーム
+};
+
 //タイトルコンポーネント
 class TitleScene :public Scene
 {
@@ -21,11 +28,16 @@ public:
 
 
 private:
+	float Timer = 0;
+	bool Click = false;	//ボタンを押したかどうか
+	GameObjectPtr uiPressSpace;	//プレススペーステキスト
+	GameObjectPtr uiTutorial;	//チュートリアルテキスト
+	GameObjectPtr uiGameStart;	//メインゲームテキスト
 
-	bool Click = false;//ボタンを押したかどうか
-	GameObjectPtr uiPressSpace;
 	GameObjectPtr uiTitle;
 
+	//最初にチュートリアルを選択しておく
+	Select select = Select::Tutorial;
 };
 
 

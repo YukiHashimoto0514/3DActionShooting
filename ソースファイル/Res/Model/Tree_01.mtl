@@ -1,7 +1,7 @@
 newmtl tree_branches
 Kd 0.9698226 1 0.3803922
 Tr 1
-d 0
+d 1
 map_Kd tree_branches.tga
 illum 2
 

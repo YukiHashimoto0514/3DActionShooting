@@ -1,0 +1,5 @@
+newmtl Trigger
+Kd 1 1 1
+map_Kd Trigger.tga
+illum 2
+

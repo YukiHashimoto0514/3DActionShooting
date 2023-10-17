@@ -1,5 +1,5 @@
 #include "DeviationEnemy.h"
-#include "../Component/BulletMove.h"
+#include "../Component/EnemyBulletMove.h"
 #include "../Component/MeshRenderer.h"
 #include "../Component/Collider.h"
 #include "../Component/DamageSource.h"
@@ -111,26 +111,26 @@ void DeviationEnemy::Shot(float deltaTime)
 
 	//弾の生成
 	{
-		auto enemybullet = this->engine->Create<GameObject>("enemybullet");
+		auto enemyBullet = this->engine->Create<GameObject>("enemybullet");
 		 
-		auto enemybulletRenderer = enemybullet->AddComponent<MeshRenderer>();
-		enemybulletRenderer->mesh = this->engine->LoadOBJ("Sphere");
-		enemybulletRenderer->scale = vec3(0.5f);
+		auto enemyBulletRenderer = enemyBullet->AddComponent<MeshRenderer>();
+		enemyBulletRenderer->mesh = this->engine->LoadOBJ("Sphere");
+		enemyBulletRenderer->scale = vec3(0.5f);
 
 		//正面方向に進む
-		auto enemymove = enemybullet->AddComponent<BulletMove>();
-		enemymove->SetOwnerinfo(this, *enemybullet);
+		auto enemyMove = enemyBullet->AddComponent<EnemyBulletMove>();
+		enemyMove->SetOwnerinfo(this, *enemyBullet);
 
 		//コライダーの設定
-		auto enemybulletcollider = enemybullet->AddComponent<SphereCollider>();
-		enemybulletcollider->sphere.Center = enemybulletRenderer->translate;
-		enemybulletcollider->sphere.Radius = std::max({
-			enemybulletRenderer->scale.x,
-			enemybulletRenderer->scale.y,
-			enemybulletRenderer->scale.z });
+		auto enemyBulletCollider = enemyBullet->AddComponent<SphereCollider>();
+		enemyBulletCollider->sphere.Center = enemyBulletRenderer->translate;
+		enemyBulletCollider->sphere.Radius = std::max({
+			enemyBulletRenderer->scale.x,
+			enemyBulletRenderer->scale.y,
+			enemyBulletRenderer->scale.z });
 
 		//ダメージを与える先を指定
-		auto da = enemybullet->AddComponent<DamageSource>();
+		auto da = enemyBullet->AddComponent<DamageSource>();
 		da->targetName = "player";
 		da->isOnce = true;
 

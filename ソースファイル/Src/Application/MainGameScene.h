@@ -30,18 +30,22 @@ public:
 	void CameraRot(GLFWwindow* window, GameObjectPtr camera, float deltaTime, double MouceX, double MouceY);
 	void PlayerUpdate(Engine& engine, PlayerPtr player, float deltaTime);
 
-	size_t mouce;
-	GameObjectPtr uimouce;
+	size_t mouce;			//照準画像
+	GameObjectPtr uimouce;	//マウスオブジェ
 
 private:
 
-	void PlayerInit(Engine& engine);
+	void PlayerInit(Engine& engine);	//プレイヤー更新
+	void UIUpdate();	//UI更新
 
 	GameObjectPtr BossObj;
 	PlayerPtr PlayerObj;
 
-	GameObjectPtr cameraobj;
-
+	GameObjectPtr cameraobj;	//カメラ
+	GameObjectPtr Select;		//選択画像のオブジェクト
+	GameObjectPtr Pistole;		//ピストル画像のオブジェクトを
+	GameObjectPtr Assault;		//アサルト画像のオブジェクトを
+	GameObjectPtr ShotGun;		//ショットガン画像のオブジェクトを
 
 	//乱数
 	std::random_device rd;
@@ -49,11 +53,15 @@ private:
 	TimeLimitPtr TimeManager;	//制限時間を測るマネージャー
 	GameObjectPtr HPBarImg;		//HPバーの画像
 
-	double MouceX, MouceY;		//マウスのポジション
-	double oldX, oldY;			//マウスの昔の位置
+	double MouceX = 0;	//マウスのポジション
+	double MouceY = 0;	//マウスのポジション
+	double oldX = 0;	//マウスの昔の位置
+	double oldY = 0;	//マウスの昔の位置
 
-	float enemycreate = 0;	//エネミーを生成するクールタイム
+	float EnemyCreate = 0;	//エネミーを生成するクールタイム
 	float LimitTime = 180;	//残り時間
+
+	const float UIMARGINE = 150.0f;	//UI画像の幅
 
 	bool BossShow = false;//ボスが出現する(true=出現　false=未出現)
 

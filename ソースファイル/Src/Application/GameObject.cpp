@@ -33,11 +33,6 @@ void GameObject::Update(float deltaTime)
 		e->Update(*this, deltaTime);
 	}
 
-	if (this->GetAir())
-	{
-		//if (GetMovable())
-			//this->AddPosition(vec3(0, -deltaTime * 10, 0));
-	}
 }
 
 //コリジョンイベント

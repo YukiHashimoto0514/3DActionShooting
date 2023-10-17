@@ -196,6 +196,7 @@ public:
 		return nullptr;
 	}
 
+
 private:
 	int Initialize();	//‰Šú‰»
 	int MainLoop();		//ƒƒCƒ“ƒ‹[ƒv

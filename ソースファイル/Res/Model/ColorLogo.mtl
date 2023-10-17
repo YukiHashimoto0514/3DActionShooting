@@ -1,0 +1,5 @@
+newmtl Color
+Kd 1 1 1
+map_Kd Color.tga
+illum 2
+

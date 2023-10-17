@@ -1,0 +1,5 @@
+newmtl Key
+Kd 1 1 1
+map_Kd Key.tga
+illum 2
+

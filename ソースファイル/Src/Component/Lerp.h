@@ -140,13 +140,13 @@ inline float Soft(float deltaTime)
 {
 	if (deltaTime < 0.5)
 	{
-		return -(pow(2, 20 * deltaTime - 10) * (static_cast<float>(sin(20 * deltaTime - 11.125f)) * 2 * 3.14f / 4.5)) * 0.5f;
+		return static_cast<float>(-(pow(2, 20 * deltaTime - 10) * (sin(20 * deltaTime - 11.125f) * 2 * 3.14f / 4.5f))) * 0.5f;
 	}
 	else
 	{
-		return (pow(2, -20 * deltaTime + 10) * (static_cast<float>(sin(20 * deltaTime - 11.125f)) * 2 * 3.14f / 4.5)) / 2 + 1;
+		return static_cast<float>(pow(2, -20 * deltaTime + 10) * (sin(20 * deltaTime - 11.125f) * 2 * 3.14f / 4.5f)) / 2 + 1;
 	}
 
 }
 
-#endif //COMPONENT_ANGlEMOVE_H_INCLUDED
+#endif //COMPONENT_LERP_H_INCLUDED

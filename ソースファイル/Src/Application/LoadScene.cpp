@@ -39,27 +39,13 @@ bool LoadScene::Initialize(Engine& engine)
 		LoadLayer, "LoadPlanet", 640, 360);
 	uiPlanet->AddSprite({ 0,0,1,1 });
 
-	//ロードテキスト
-	if (engine.GetMapLevel() == 0)
-	{
-		const char load[] = "Now Loading...";
-		const float fontSizeX2 = 15;
-		const float loadx =
-			640 - static_cast<float>(std::size(load) - 1) * fontSizeX2;
-		Loadstr = engine.CreateUI<GameObject>(textLayer, "text", loadx, 600);
-		auto textLoad2 = Loadstr->AddComponent<Text>();
-		textLoad2->SetText(load, 2);
-	}
-	else
-	{
-		const char load[] = "Load Next Scene...";
-		const float fontSizeX2 = 15;
-		const float loadx =
-			640 - static_cast<float>(std::size(load) - 1) * fontSizeX2;
-		Loadstr = engine.CreateUI<GameObject>(textLayer, "text", loadx, 600);
-		auto textLoad2 = Loadstr->AddComponent<Text>();
-		textLoad2->SetText(load, 2);
-	}
+	const char load[] = "Now Loading...";
+	const float fontSizeX2 = 15;
+	const float loadx =
+		640 - static_cast<float>(std::size(load) - 1) * fontSizeX2;
+	Loadstr = engine.CreateUI<GameObject>(textLayer, "text", loadx, 600);
+	auto textLoad2 = Loadstr->AddComponent<Text>();
+	textLoad2->SetText(load, 2);
 
 	//ゲームの開始方法を示すテキスト
 	const char strToPlay[] = "Press Space To Start";
@@ -78,10 +64,9 @@ bool LoadScene::Initialize(Engine& engine)
 	engine.SlowSpeed = 1;
 
 	//ロードパーセントを表示
-	const float fontSizeX2 = 15;
-	const float loadx =
+	const float loadX =
 		640 - 2 * fontSizeX2;
-	txtLoad = engine.CreateUI<GameObject>(textLayer, "Loadtxt", loadx, 500);
+	txtLoad = engine.CreateUI<GameObject>(textLayer, "Loadtxt", loadX, 500);
 
 	char str[16];									//表示する文字列
 	snprintf(str, std::size(str), "LoadPercent 0");		//文字表示
@@ -123,7 +108,10 @@ void LoadScene::Update(Engine& engine, float deltaTime)
 {
 	Timer += deltaTime;			//イージングをするためのタイマー
 
-		//フェードアウトが完了したら
+	//だんだん大きくする
+	uiPlanet->SetScale(vec3(Timer));
+
+	//フェードアウトが完了したら
 	if (engine.GetFadeState() == Engine::FadeState::Closed)
 	{
 		engine.SetNextScene<MainGameScene>();		//タイトルシーンに（仮）
@@ -144,19 +132,17 @@ void LoadScene::Update(Engine& engine, float deltaTime)
 			}
 		}
 	}
-	else//ロード中
-	{
-	}
 
-	//0.5秒後から読み込み開始
-	if (Timer >= 0.5f)
+
+	//1.0秒後から読み込み開始
+	if (Timer >= 1.0f)
 	{
 		if (!Loadflg)
 		{
 			if (i < LoadLength)
 			{
 				//読み込み具合を計算
-				const float per = i / (LoadLength - 1) * 100;
+				const float per = i / (LoadLength - 1.0f) * 100.0f;
 
 				//読み込みパーセントを更新
 				char str[16];									//表示する文字列
@@ -192,8 +178,9 @@ void LoadScene::Update(Engine& engine, float deltaTime)
 				const float fontSizeX2 = 15;
 				const float loadx =
 					640 - static_cast<float>(std::size(load) - 1) * fontSizeX2;
-				Loadstr = engine.CreateUI<GameObject>(textLayer, "text", loadx, 600);
-				auto textLoad2 = Loadstr->AddComponent<Text>();
+				auto loadstr = engine.CreateUI<GameObject>(textLayer, "text", loadx, 600);
+				auto textLoad2 = loadstr->AddComponent<Text>();
+
 				textLoad2->SetText(load, 4);
 
 			}
