@@ -362,6 +362,8 @@ GameObjectList Engine::LoadGameObjectMap(const char* filename,
 		}
 		else if (Tag == "Rock")//動かせる岩の場合
 		{
+
+			gameObject->name = "Rock";	//名前を岩にする
 			//コライダーを割り当てる
 			auto Gcollider = gameObject->AddComponent<BoxCollider>();
 			Gcollider->box.Scale = renderer->scale;
@@ -431,7 +433,7 @@ GameObjectList Engine::LoadGameObjectMap(const char* filename,
 			auto ps = ParticleObject->AddComponent<ParticleSystem>();
 			ps->Emitters.resize(1);
 			auto& emitter = ps->Emitters[0];
-			emitter.ep.ImagePath = "Res/Last.tga";
+			emitter.ep.ImagePath = "Res/UI/Last.tga";
 
 			emitter.ep.RandomizeRotation = 1;		//角度をつける
 			emitter.ep.RandomizeDirection = 1;
@@ -628,15 +630,15 @@ int Engine::Initialize()
 
 	//シェーダーファイル(2D)の読み込み
 	progSprite = ProgramPipeline::Create(
-		"Res/standard_2D.vert", "Res/standard_2D.frag");
+		"Res/Shader/standard_2D.vert", "Res/Shader/standard_2D.frag");
 
 	//シェーダーファイル(3D)の読み込み
 	progStandard3D = ProgramPipeline::Create(
-		"Res/standard_3D.vert", "Res/standard_3D.frag");
+		"Res/Shader/standard_3D.vert", "Res/Shader/standard_3D.frag");
 
 	//影用オブジェクトを作成
 	fboShadow = FramebufferObject::Create(1024, 1024, FboType::depth);
-	progShadow = ProgramPipeline::Create("Res/shadow.vert", "Res/shadow.frag");
+	progShadow = ProgramPipeline::Create("Res/Shader/shadow.vert", "Res/Shader/shadow.frag");
 
 	//スカイボックス用オブジェクトを生成
 	const std::string skyBoxPathList[6] = {
@@ -646,7 +648,7 @@ int Engine::Initialize()
 	};
 
 	texSkyBox = Texture::CreateCubeMap(skyBoxPathList);
-	progSkyBox = ProgramPipeline::Create("Res/skybox.vert", "Res/skybox.frag");
+	progSkyBox = ProgramPipeline::Create("Res/Shader/skybox.vert", "Res/Shader/skybox.frag");
 
 	//ゲームウィンドウ用FBOを作成
 	const vec2 viewSize = GetViewSize();
@@ -655,21 +657,21 @@ int Engine::Initialize()
 	
 	//ぼかしシェーダを読み込む
 	progGaussianBlur = ProgramPipeline::Create(
-		"Res/standard_2D.vert", "Res/gaussian_blur.frag");
+		"Res/Shader/standard_2D.vert", "Res/Shader/gaussian_blur.frag");
 
 	//ブルーム用シェーダ―を読み込む
 	progHighPassFilter = ProgramPipeline::Create(
-		"Res/simple_2D.vert", "Res/high_pass_filter.frag");
+		"Res/Shader/simple_2D.vert", "Res/Shader/high_pass_filter.frag");
 	progDownSampling = ProgramPipeline::Create(
-		"Res/simple_2D.vert", "Res/down_sampling.frag");
+		"Res/Shader/simple_2D.vert", "Res/Shader/down_sampling.frag");
 	progUpSampling = ProgramPipeline::Create(
-		"Res/simple_2D.vert", "Res/up_sampling.frag");
+		"Res/Shader/simple_2D.vert", "Res/Shader/up_sampling.frag");
 
 	//シーン遷移エフェクト用のファイルを読み込む
-	progFade = ProgramPipeline::Create("Res/simple_2D.vert", "Res/fade.frag");
-	texFadeColor = Texture::Create("Res/fade_color.tga",
+	progFade = ProgramPipeline::Create("Res/Shader/simple_2D.vert", "Res/Shader/fade.frag");
+	texFadeColor = Texture::Create("Res/Fade/fade_color.tga",
 		GL_LINEAR, Texture::Usage::for3D);
-	texFadeRule = Texture::Create("Res/fade_rule.tga",
+	texFadeRule = Texture::Create("Res/Fade/fade_rule.tga",
 		GL_LINEAR, Texture::Usage::for3DLinear);
 
 	//座標変換行列をユニフォーム変数にコピー
@@ -749,7 +751,7 @@ int Engine::Initialize()
 
 	//3Dモデル用のバッファを作成
 	meshBuffer = Mesh::MeshBuffer::Create(
-		sizeof(Mesh::Vertex) * 300'000, sizeof(uint16_t) * 900'000);
+		sizeof(Mesh::Vertex) * 350'000, sizeof(uint16_t) * 950'000);
 	meshBuffer->CreateBox("Box");
 	meshBuffer->CreateSphere("Sphere");
 	for (int i = 1; i <= 8; ++i)
@@ -760,7 +762,7 @@ int Engine::Initialize()
 	}
 
 	primitiveBuffer = Mesh::PrimitiveBuffer::Create(
-		sizeof(Mesh::Vertex) * 250'000, sizeof(uint16_t) * 650'000);
+		sizeof(Mesh::Vertex) * 300'000, sizeof(uint16_t) * 700'000);
 
 	//メインカメラを作成
 	cameraObject = Create<GameObject>("Main Camera");
@@ -771,7 +773,7 @@ int Engine::Initialize()
 	rg.seed(rd());			//疑似乱数を「真の乱数」で初期化
 
 	//パーティクルマネージャーを作成
-	particleManager = ParticleManager::Create(100'000);
+	particleManager = ParticleManager::Create(90'000);
 
 	//ゲームオブジェクト配列の容量を予約
 	gameObjectList.reserve(1000);	//1000分予約した。
@@ -1354,9 +1356,9 @@ void Engine::MakeSpriteList(GameObjectList& gameObjectList, SpriteList& spriteLi
 			s.z = e->GetRotation().x;
 			s.w = e->GetAlpha();
 			s.size = e->GetScale().x;
-			s.red = 1;
-			s.green = 1;
-			s.blue = 1;
+			s.red = e->GetRGB().x;
+			s.green = e->GetRGB().y;
+			s.blue = e->GetRGB().z;
 		}
 	}
 }

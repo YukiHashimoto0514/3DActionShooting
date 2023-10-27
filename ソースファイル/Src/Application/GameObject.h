@@ -136,6 +136,10 @@ public:
 	{
 		return Scale;
 	}
+	const vec3& GetRGB() const
+	{
+		return RGB;
+	}
 
 	bool GetMovable() const
 	{
@@ -193,6 +197,10 @@ public:
 	{
 		Right = _right;
 	}
+	void SetRGB(vec3 _rgb)
+	{
+		RGB = _rgb;
+	}
 
 	void SetJumpFlg(bool _jump)
 	{
@@ -232,6 +240,7 @@ private:
 	vec3 Right = { 0,0,0 };		//‰E‘¤‚ÌŒü‚«
 	vec3 Rotation = { 0,0,0 };	//‰ñ“]
 	vec3 Scale = { 1,1,1 };		//Šg‘å—¦
+	vec3 RGB = { 1,1,1 };		//‚RŒ´F
 
 	float HP = 1.0f;				//‘Ì—Í
 	float ImmortalTime = 0;			//–³“GŠÔ
@@ -251,8 +260,6 @@ private:
 
 	std::vector<MeshRendererPtr> meshRendererList;
 };
-
-
 
 
 #endif //GAMEOBJECT_H_INCLUDED

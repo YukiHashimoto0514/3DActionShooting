@@ -22,6 +22,8 @@ public:
 	virtual void OnTakeDamage(GameObject& gameObject, GameObject& other, const Damage& dammage)override
 	{
 
+		const float Time = std::clamp(dammage.amount, 1.0f, dammage.amount);
+
 		//ヒットエフェクトの生成
 		auto ParticleObject = gameObject.engine->Create<GameObject>(
 			"particle explosion", gameObject.GetPos());
@@ -29,9 +31,9 @@ public:
 		auto ps = ParticleObject->AddComponent<ParticleSystem>();
 		ps->Emitters.resize(1);
 		auto& emitter = ps->Emitters[0];
-		emitter.ep.ImagePath = "Res/hit.tga";
+		emitter.ep.ImagePath = "Res/UI/hit.tga";
 		emitter.ep.tiles = { 3,2 };				//画像枚数
-		emitter.ep.Duration = dammage.amount * 0.1f;	//放出時間
+		emitter.ep.Duration = Time * 0.1f;	//放出時間
 		emitter.ep.RandomizeSize = 1;			//大きさをランダムに
 		emitter.ep.RandomizeRotation = 1;		//角度をつける
 		emitter.ep.EmissionsPerSecond = 10;		//秒間放出数

@@ -15,10 +15,16 @@ public:
 
 	virtual void Update(float deltaTime)override;
 	virtual void TakeDamage(GameObject& other, const Damage& damage)override;
+	virtual void OnCollision(GameObject& object)override;	
 
 	int GetShotStyle() const
 	{
 		return ShotStyle;
+	}
+
+	float GetMaxHP()const
+	{
+		return MaxHP;
 	}
 
 	float GetShotInterval() const
@@ -63,27 +69,29 @@ public:
 	{
 		ShooterFlg = _flg;
 	}
+
 private:
 
 	//重力
 	const float Gravity = 9.8f;
 
-	float ShotInterval = 2.0f;	//射撃クールタイム
+	float ShotInterval = 0.5f;	//射撃クールタイム
 	float ShotCoolTime = 0;		//射撃間隔
 	float ShotDamage = 1.0f;	//与えるダメージ
 	float JumpTimer = 0;		//ジャンプで使うタイマー
 	float FallTimer = 0;		//落下中に使うタイマー
 	float MoveSpeed = 15.0f ;	//移動速度
-
+	float MaxHP = 5;			//最大HP
 	int ShotStyle = 0;			//射撃方法
 
 	bool ShotGunFlg = false;	//ショットガンを使用できるかどうか
 	bool ShooterFlg = false;	//シューターを使用できるかどうか
-
+	bool NearFlg = false;		//近すぎフラグ
 	void Jump(float deltaTime);	//ジャンプ処理
 	void Move(float deltaTime);	//移動処理
 	void Shot(float deltaTime);	//射撃処理
 	void Fall(float deltaTime);	//落下処理
+	void SelectShot(int _shot);	//武器選択処理
 };
 
 

@@ -18,6 +18,9 @@ public:
 		//‰½‚ª—ˆ‚Ä‚àˆê’U‰Šú’l‚É•Ô‚·
 		{
 			other.SetPos(vec3{ 0,3,0 });
+
+			//—‚¿‚½‚çŒ»İ‚Ì‚WŠ„í‚ê‚é
+			other.SetHP(other.GetHP() * 0.8f);
 		}
 	}
 

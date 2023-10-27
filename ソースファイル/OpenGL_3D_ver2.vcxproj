@@ -215,6 +215,7 @@
     <ClInclude Include="Src\Component\Player.h" />
     <ClInclude Include="Src\Component\DropPowerUp.h" />
     <ClInclude Include="Src\Component\RedHPBar.h" />
+    <ClInclude Include="Src\Component\TextMove.h" />
     <ClInclude Include="Src\Component\TimeLimit.h" />
     <ClInclude Include="Src\Component\TreasureBox.h" />
     <ClInclude Include="Src\Component\UnderBoder.h" />

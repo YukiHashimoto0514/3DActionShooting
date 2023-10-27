@@ -6,7 +6,8 @@
 #include "../Engine/Debug.h"
 #include "../Engine/Engine.h"
 #include "../Component/Player.h"
-//プレイヤークラス
+
+//アイテムクラス
 class ItemObject :public GameObject
 {
 public:

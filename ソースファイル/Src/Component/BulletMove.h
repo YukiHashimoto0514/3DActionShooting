@@ -25,13 +25,13 @@ public:
 		if (Randamness)
 		{
 			forward.x += std::clamp(
-				std::normal_distribution<float>(0, 0.1f)(rd), -0.1f, 0.1f);	//‘å‘Ì‚O•t‹ß‚Ì—”
+				std::normal_distribution<float>(0.0f, 0.05f)(rd), -0.1f, 0.1f);	//‘å‘Ì‚O•t‹ß‚Ì—”
 
 			forward.y += std::clamp(
-				std::normal_distribution<float>(0, 0.1f)(rd), -0.1f, 0.1f);	//‘å‘Ì‚O•t‹ß‚Ì—”
+				std::normal_distribution<float>(0.0f, 0.05f)(rd), -0.1f, 0.1f);	//‘å‘Ì‚O•t‹ß‚Ì—”
 
 			forward.z += std::clamp(
-				std::normal_distribution<float>(0, 0.1f)(rd), -0.1f, 0.1f);	//‘å‘Ì‚O•t‹ß‚Ì—”
+				std::normal_distribution<float>(0.0f, 0.05f)(rd), -0.1f, 0.1f);	//‘å‘Ì‚O•t‹ß‚Ì—”
 		}
 
 

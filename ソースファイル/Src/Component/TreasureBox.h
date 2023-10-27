@@ -24,9 +24,7 @@ public:
 		ps->Emitters.resize(1);
 		auto& emitter = ps->Emitters[0];
 		
-		if (TutorialFlg)
-		{
-			emitter.ep.ImagePath = "Res/star.tga";
+			emitter.ep.ImagePath = "Res/UI/star.tga";
 			emitter.ep.Duration = 0.1f;				//放出時間
 			emitter.ep.RandomizeSize = 1;			//大きさをランダムに
 			emitter.ep.RandomizeRotation = 1;		//角度をつける
@@ -37,23 +35,6 @@ public:
 			emitter.pp.velocity.Set({ 0,25,0 }, { 0,-1,0 });//上方向に放出
 
 			emitter.ep.Loop = true;
-		}
-		else
-		{
-			emitter.ep.ImagePath = "Res/Last.tga";
-
-			emitter.ep.RandomizeRotation = 1;		//角度をつける
-			emitter.ep.RandomizeDirection = 1;
-			emitter.ep.RandomizeSize = 1;			//大きさをランダムに
-			emitter.ep.Duration = 0.3f;				//放出時間
-			emitter.ep.EmissionsPerSecond = 60;	//秒間放出数
-
-			emitter.pp.LifeTime = 0.4f;				//生存時間
-			emitter.pp.color.Set({ 5, 1, 5.5f, 1 }, { 1, 2, 1.5f, 0 });	//色付け
-			emitter.pp.scale.Set({ 0.3f,0.1f }, { 0.05f,0.02f });	//サイズを徐々にへ変更させる
-
-			emitter.ep.Loop = true;
-		}
 
 
 
@@ -85,15 +66,10 @@ public:
 		Target = _p;
 	}
 
-	void SetTutorialFlg(bool _flg)
-	{
-		TutorialFlg = _flg;
-	}
 private:
 	GameObjectPtr ParticleObj;
 	PlayerPtr Target;
 
-	bool TutorialFlg = false;	//チュートリアルかどうかを判別する
 };
 
 

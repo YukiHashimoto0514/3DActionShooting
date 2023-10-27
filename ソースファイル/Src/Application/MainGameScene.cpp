@@ -53,7 +53,7 @@ bool MainGameScene::Initialize(Engine& engine)
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	//マップの読み込み
-	auto gameObjList = engine.LoadGameObjectMap("Res/mapmodel.json", vec3(0, 0, 0), vec3(1));
+	auto gameObjList = engine.LoadGameObjectMap("Res/mapmodel2.json", vec3(0, 0, 0), vec3(1));
 
 	//プレイヤーの情報
 	PlayerInit(engine);
@@ -69,7 +69,7 @@ bool MainGameScene::Initialize(Engine& engine)
 
 	//ワープ（マップ作成中）
 	{
-		////ワープの数（２個１）
+		//ワープの数（２個１）
 		//const int WarpCount = 2;
 
 		////ワープの設定
@@ -94,23 +94,36 @@ bool MainGameScene::Initialize(Engine& engine)
 	}
 
 	//画面の中心にエイムを表示
-	mouce = engine.AddUILayer("Res/Bullet_1.tga", GL_LINEAR, 10);
+	mouce = engine.AddUILayer("Res/UI/Bullet_1.tga", GL_LINEAR, 10);
 	uimouce = engine.CreateUI<GameObject>(mouce, "aim", 367, 50);
 	uimouce->AddSprite({ 0,0,1,1 });
 	uimouce->SetPos(vec3(640, 360, 0)); 
 
 	//フェードインをする
-	engine.SetFadeRule("Res/fade_rule3.tga");
+	engine.SetFadeRule("Res/Fade/fade_rule3.tga");
 	engine.StartFadeIn();
 
 	//セレクト画像の設定
-	size_t SelectImg = engine.AddUILayer("Res/Select.tga", GL_LINEAR, 10);
+	size_t SelectImg = engine.AddUILayer("Res/UI/Select.tga", GL_LINEAR, 10);
 	Select = engine.CreateUI<GameObject>(SelectImg, "select", 0, 300);
 	Select->AddSprite({ 0,0,1,1 });
 	Select->SetPos(vec3{ 70,546,0 });
-	
+
+	//武器を持った時に背景を半透明にする
+	size_t HalfImg = engine.AddUILayer("Res/UI/half.tga", GL_LINEAR, 10);
+	for (int i = 0; i < 3; ++i)
+	{
+		Half[i] = engine.CreateUI<GameObject>(HalfImg, "select", 0, 300);
+		Half[i]->AddSprite({ 0,0,1,1 });
+		Half[i]->SetPos(vec3{ 70.0f + UIMARGINE * i,546,0 });
+		Half[i]->SetAlpha(0);
+	}
+
+	//ピストルは最初から持ってるので
+	Half[0]->SetAlpha(1);
+
 	//武器フレーム画像の配置
-	size_t WeaponFrameImg = engine.AddUILayer("Res/WeaponFrame.tga", GL_LINEAR, 10);
+	size_t WeaponFrameImg = engine.AddUILayer("Res/UI/WeaponFrame.tga", GL_LINEAR, 10);
 	for (int i = 0; i < 3; i++)
 	{
 		GameObjectPtr WeaponFrame = engine.CreateUI<GameObject>(WeaponFrameImg, "frame", 0, 300);
@@ -119,20 +132,20 @@ bool MainGameScene::Initialize(Engine& engine)
 	}
 
 	//ピストル画像の設定
-	size_t PistoleImg = engine.AddUILayer("Res/Pistole.tga", GL_LINEAR, 10);
+	size_t PistoleImg = engine.AddUILayer("Res/UI/Pistole.tga", GL_LINEAR, 10);
 	Pistole = engine.CreateUI<GameObject>(PistoleImg, "pistle", 0, 300);
 	Pistole->AddSprite({ 0,0,1,1 });
 	Pistole->SetPos(vec3{ 70,546,0 });
 
 	//アサルト画像の設定
-	size_t AssaultImg = engine.AddUILayer("Res/Assault.tga", GL_LINEAR, 10);
+	size_t AssaultImg = engine.AddUILayer("Res/UI/Assault.tga", GL_LINEAR, 10);
 	Assault = engine.CreateUI<GameObject>(AssaultImg, "assault", 0, 300);
 	Assault->AddSprite({ 0,0,1,1 });
 	Assault->SetPos(vec3{ 220,546,0 });
 	Assault->SetAlpha(0);
 
 	//ショットガン画像の設定
-	size_t ShotGunImg = engine.AddUILayer("Res/ShotGun.tga", GL_LINEAR, 10);
+	size_t ShotGunImg = engine.AddUILayer("Res/UI/ShotGun.tga", GL_LINEAR, 10);
 	ShotGun = engine.CreateUI<GameObject>(ShotGunImg, "shotgun", 0, 300);
 	ShotGun->AddSprite({ 0,0,1,1 });
 	ShotGun->SetPos(vec3{ 370,546,0 });
@@ -140,13 +153,13 @@ bool MainGameScene::Initialize(Engine& engine)
 
 
 	//赤色のHPバーの設定
-	size_t RedImg = engine.AddUILayer("Res/RedBar.tga", GL_LINEAR, 10);
+	size_t RedImg = engine.AddUILayer("Res/UI/RedBar.tga", GL_LINEAR, 10);
 	GameObjectPtr RedHPImg = engine.CreateUI<GameObject>(RedImg, "red", 0, 300);
 	RedHPImg->AddSprite({ 0,0,1,1 });
 	RedHPImg->SetPos(vec3{ 0,500,0 });
 
 	//HPバーの設定
-	size_t HPImg = engine.AddUILayer("Res/HPBar.tga", GL_LINEAR, 10);
+	size_t HPImg = engine.AddUILayer("Res/UI/HPBar.tga", GL_LINEAR, 10);
 	HPBarImg = engine.CreateUI<GameObject>(HPImg, "green", 0, 300);
 	HPBarImg->AddSprite({ 0,0,1,1 });
 	HPBarImg->SetPos(vec3{ 0,500,0 });
@@ -163,14 +176,14 @@ bool MainGameScene::Initialize(Engine& engine)
 
 
 	//HPバーフレームの設定
-	size_t HPFrameImg = engine.AddUILayer("Res/HPFrame.tga", GL_LINEAR, 10);
+	size_t HPFrameImg = engine.AddUILayer("Res/UI/HPFrame.tga", GL_LINEAR, 10);
 	GameObjectPtr HPFrame = engine.CreateUI<GameObject>(HPFrameImg, "hpframe", 0, 500);
 	HPFrame->AddSprite({ 0,0,1,1 });
 	HPFrame->SetPos(vec3{ 230,650,0 });
 
 
 	//フォント画像
-	const size_t textLayer = engine.AddUILayer("Res/font_04_2.tga", GL_NEAREST, 10);
+	const size_t textLayer = engine.AddUILayer("Res/UI/font_04_2.tga", GL_NEAREST, 10);
 
 	//制限時間UI
 	auto uiTime = engine.CreateUI<GameObject>(textLayer, "time", 940, 600);
@@ -216,8 +229,8 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 			auto CapsuleRenderer2 = BossObj->AddComponent<MeshRenderer>();
 			CapsuleRenderer2->mesh = engine.LoadOBJ("Capsule2");
 			CapsuleRenderer2->scale = vec3(2);
-			BossObj->SetHP(50);
-
+			BossObj->SetHP(1);
+			
 			auto ex = BossObj->AddComponent<BossExplosion>();
 
 			//個別に色を変えるために、マテリアルをコピー
@@ -258,8 +271,9 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 	PlayerUpdate(engine, PlayerObj, deltaTime);
 
 	//カメラをプレイヤーに合わせる
-	cameraobj->SetPos(PlayerObj->GetPos());
+	cameraobj->SetPos({ PlayerObj->GetPos().x,PlayerObj->GetPos().y+0.5f,PlayerObj->GetPos().z });
 
+	//cameraobj->SetPos(PlayerObj->GetPos() - PlayerObj->GetForward() * 2);
 	//ｙ軸を合わせる
 	PlayerObj->SetRotation(vec3(0,cameraobj->GetRotation().y,0));
 
@@ -274,7 +288,7 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 	EnemyCreate += deltaTime;
 
 	//残り時間が少ない程大量に生成される
-	if (EnemyCreate >= LimitTime/20)
+	if (EnemyCreate >= LimitTime * 0.08f)
 	{
 		EnemyCreate = 0;
 
@@ -287,7 +301,7 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 			king->SetTarget(PlayerObj);
 
 			//ｈPの設定
-			const float hp = std::uniform_real_distribution<float>(50, 100)(engine.GetRandomGenerator());//50~100
+			const float hp = std::uniform_real_distribution<float>(200, 500)(engine.GetRandomGenerator());//50~100
 			king->SetHP(hp);
 
 			//モデル描画
@@ -321,12 +335,14 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 				kingRenderer->scale.y,
 				kingRenderer->scale.z });
 
+			auto he = king->AddComponent<HitEffect>();	//エフェクト
 			auto hh = king->AddComponent<Health>();		//HP
 			auto ee = king->AddComponent<Explosion>();	//爆発
 			auto dp = king->AddComponent<DropPowerUp>();//アイテム
 			dp->target = PlayerObj;
+			dp->KingFlg = true;
 		}
-		else if(rand>=50)//偏差撃ちをする敵
+		else if (rand >= 50)//偏差撃ちをする敵
 		{
 			auto ene = engine.Create<DeviationEnemy>("enemy");
 			ene->SetTarget(PlayerObj);
@@ -366,7 +382,7 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 				eneRenderer->scale.y,
 				eneRenderer->scale.z });
 
-			
+
 			auto he = ene->AddComponent<HitEffect>();	//エフェクト
 			auto hh = ene->AddComponent<Health>();		//HP
 			auto ee = ene->AddComponent<Explosion>();	//爆発
@@ -502,7 +518,7 @@ void MainGameScene::PlayerInit(Engine& engine)
 	PlayerObj->name = "player";
 
 	//HP
-	PlayerObj->SetHP(5);
+	PlayerObj->SetHP(PlayerObj->GetMaxHP());
 
 	//カプセルの当たり判定を割り当て
 	auto capcollider = PlayerObj->AddComponent<CapsuleCollider>();
@@ -523,6 +539,9 @@ void MainGameScene::UIUpdate()
 	//一番左の定位置
 	vec3 Pos = vec3{ 70,546,0 };
 
+	const float NormalSize = 1.0f;	//通常サイズ
+	const float MinimamSize = 0.6f;	//小さいサイズ
+
 	switch (PlayerObj->GetShotStyle())
 	{
 	case 0:
@@ -533,6 +552,12 @@ void MainGameScene::UIUpdate()
 		Pistole->SetAlpha(1.0f);
 		Assault->SetAlpha(0.5f);
 		ShotGun->SetAlpha(0.5f);
+
+		Pistole->SetScale(vec3(NormalSize));
+		//選択されていないものはサイズを小さくする
+		Assault->SetScale(vec3(MinimamSize));
+		ShotGun->SetScale(vec3(MinimamSize));
+
 		break;
 
 	case 1:
@@ -543,6 +568,11 @@ void MainGameScene::UIUpdate()
 		Pistole->SetAlpha(0.5f);
 		Assault->SetAlpha(1.0f);
 		ShotGun->SetAlpha(0.5f);
+
+		Assault->SetScale(vec3(NormalSize));
+		//選択されていないものはサイズを小さくする
+		Pistole->SetScale(vec3(MinimamSize));
+		ShotGun->SetScale(vec3(MinimamSize));
 
 		break;
 
@@ -555,6 +585,11 @@ void MainGameScene::UIUpdate()
 		Assault->SetAlpha(0.5f);
 		ShotGun->SetAlpha(1.0f);
 
+		ShotGun->SetScale(vec3(NormalSize));
+		//選択されていないものはサイズを小さくする
+		Pistole->SetScale(vec3(MinimamSize));
+		Assault->SetScale(vec3(MinimamSize));
+
 		break;
 	default:
 		break;
@@ -563,11 +598,20 @@ void MainGameScene::UIUpdate()
 	//プレイヤーの武器の取得状況に合わせて透明度を変える
 	if (!PlayerObj->GetShooterFlg())
 	{
-		Assault->SetAlpha(0.0f);
+		Assault->SetAlpha(0.0f);	//持ってない
 	}
+	else
+	{
+		Half[1]->SetAlpha(1);		//持ってる
+	}
+
 	if (!PlayerObj->GetShotGunFlg())
 	{
-		ShotGun->SetAlpha(0.0f);
+		ShotGun->SetAlpha(0.0f);	//持ってない
+	}
+	else
+	{
+		Half[2]->SetAlpha(1);		//持ってる
 	}
 
 

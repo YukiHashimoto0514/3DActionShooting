@@ -6,7 +6,8 @@
 #include "../Engine/SpritePriority.h"
 #include "../Application/GameObject.h"
 #include "../Engine/Engine.h"
-#include "Animator2D.h"
+#include "../Application/EasyAudio.h"
+#include "../Engine/AudioSettings.h"
 
 //爆発コンポーネント
 
@@ -25,7 +26,7 @@ public:
 		auto ps = ParticleObject->AddComponent<ParticleSystem>();
 		ps->Emitters.resize(1);
 		auto& emitter = ps->Emitters[0];
-		emitter.ep.ImagePath = "Res/star.tga";
+		emitter.ep.ImagePath = "Res/UI/star.tga";
 		emitter.ep.Duration = 0.5f;				//放出時間
 		emitter.ep.EmissionsPerSecond = 30;		//秒間放出数
 		emitter.ep.RandomizeRotation = 1;		//角度ランダム性をつける
@@ -35,6 +36,9 @@ public:
 		emitter.pp.radial.Set(2, 0);			//速さ
 		emitter.pp.color.Set({ 1, 1, 0.5f, 1 }, { 1, 2, 10.5f, 0 });	//色付け
 		emitter.pp.scale.Set({ 0.05f,0.05f }, { 0.005f,0.01f });	//サイズを徐々にへ変更させる
+
+		Audio::PlayOneShot(SE::enemyExplosionS, 0.7f);
+
 	}
 
 };

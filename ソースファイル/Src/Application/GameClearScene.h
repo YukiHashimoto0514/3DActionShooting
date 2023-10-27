@@ -23,10 +23,13 @@ public:
 private:
 	float Timer = 0;	//イージングで使うタイマー
 
-	bool ClickEnter = false;	//一度クリックしたかどうか
-
+	bool Click = false;	//一度クリックしたかどうか
+	int Action = 1;		//どのアニメーションをするか
 	GameObjectPtr uiPressSpace;	//テキストオブジェクト
 	GameObjectPtr uiGameClear;	//イメージオブジェクト
+
+	//乱数
+	std::random_device rd;
 
 };
 

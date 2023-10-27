@@ -8,6 +8,8 @@
 #include "../Component/ARoundMove.h"
 #include "../Application/GameClearScene.h"
 #include "../Component/ParticleSystem.h"
+#include "../Application/EasyAudio.h"
+#include "../Engine/AudioSettings.h"
 
 void Boss::Update(float deltaTime)
 {
@@ -16,6 +18,8 @@ void Boss::Update(float deltaTime)
 	{
 		//死んだ時間を計測
 		DeadTimer += deltaTime;
+
+		player->SetImmortalTime(10);
 
 		//フェードが完了したら
 		if (engine->GetFadeState() == Engine::FadeState::Closed)
@@ -35,6 +39,8 @@ void Boss::Update(float deltaTime)
 	if (DeadTimer >= 2.0f)
 	{
 		//フェードアウトを開始
+		engine->SetFadeRule("Res/Fade/fade_rule2.tga");
+		engine->SetFadeColor("Res/UI/Boarder.tga");
 		engine->StartFadeOut();
 	}
 
@@ -49,6 +55,10 @@ void Boss::TakeDamage(GameObject& other, const Damage& damage)
 	//現在のHPが半分以下なら
 	if (MaxHP * 0.5f >= this->GetHP())
 	{
+		auto& a = static_cast<MeshRenderer&>(*this->componentList[0]);
+		a.materials[0]->baseColor = vec4(1, 0.2f, 0.2f, 1);
+
+
 		//攻撃する弾の数を増やす
 		BoxCount = 7;
 	}
@@ -63,7 +73,7 @@ void Boss::TakeDamage(GameObject& other, const Damage& damage)
 		auto ps = ParticleObject->AddComponent<ParticleSystem>();
 		ps->Emitters.resize(1);
 		auto& emitter = ps->Emitters[0];
-		emitter.ep.ImagePath = "Res/exp.tga";
+		emitter.ep.ImagePath = "Res/UI/exp.tga";
 		emitter.ep.Duration = 0.1f;				//放出時間
 		emitter.ep.RandomizeSize = 1;			//大きさをランダムに
 		emitter.ep.RandomizeRotation = 1;		//角度をつける
@@ -72,9 +82,10 @@ void Boss::TakeDamage(GameObject& other, const Damage& damage)
 		emitter.pp.LifeTime = 3.0f;				//生存時間
 		emitter.pp.color.Set({ 5, 5, 0.5f, 1 }, { 1, 2, 1.5f, 0 });	//色付け
 		emitter.pp.scale.Set({ 0.06f,0.06f }, { 0.005f,0.005f });	//サイズを徐々にへ変更させる
-		//emitter.pp.velocity.Set({ 0,25,0 }, { 0,-20,0 });//上方向に放出
 		emitter.pp.radial.Set(50, -20);
 		emitter.ep.Loop = true;
+
+		Audio::PlayOneShot(SE::BossExplosion, 0.3f);
 
 		return;
 	}
@@ -337,6 +348,9 @@ void Boss::ChangeState(Routine _state)
 
 void Boss::CreateHitEffect(float _count)
 {
+
+	const float Time = std::clamp(_count, 1.0f, _count);
+
 	//ヒットエフェクトの生成
 	auto ParticleObject = this->engine->Create<GameObject>(
 		"particle explosion", this->GetPos());
@@ -344,9 +358,9 @@ void Boss::CreateHitEffect(float _count)
 	auto ps = ParticleObject->AddComponent<ParticleSystem>();
 	ps->Emitters.resize(1);
 	auto& emitter = ps->Emitters[0];
-	emitter.ep.ImagePath = "Res/hit.tga";
+	emitter.ep.ImagePath = "Res/UI/hit.tga";
 	emitter.ep.tiles = { 3,2 };				//画像枚数
-	emitter.ep.Duration = _count * 0.1f;	//放出時間
+	emitter.ep.Duration = Time * 0.1f;	//放出時間
 	emitter.ep.RandomizeSize = 1;			//大きさをランダムに
 	emitter.ep.RandomizeRotation = 1;		//角度をつける
 	emitter.ep.EmissionsPerSecond = 10;		//秒間放出数

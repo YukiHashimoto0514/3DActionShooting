@@ -76,12 +76,10 @@ bool TutorialScene::Initialize(Engine& engine)
 	auto treasure = engine.SearchGameObject("Golden_Chest");
 	auto  chest = treasure->AddComponent<TreasureBox>();
 	chest->SetTarget(PlayerObj);
-	chest->SetTutorialFlg(true);
 
 	auto Treasure = engine.SearchGameObject("Golden_Chest (1)");
 	auto  Chest = Treasure->AddComponent<TreasureBox>();
 	Chest->SetTarget(PlayerObj);
-	Chest->SetTutorialFlg(true);
 
 	//ゴールの生成
 	auto GoalObj = engine.SearchGameObject("Goal");
@@ -90,20 +88,20 @@ bool TutorialScene::Initialize(Engine& engine)
 	goal->SetTarget(PlayerObj);
 
 	//画面の中心にエイムを表示
-	size_t mouce = engine.AddUILayer("Res/Bullet_1.tga", GL_LINEAR, 10);
+	size_t mouce = engine.AddUILayer("Res/UI/Bullet_1.tga", GL_LINEAR, 10);
 	GameObjectPtr uimouce = engine.CreateUI<GameObject>(mouce, "aim", 367, 50);
 	uimouce->AddSprite({ 0,0,1,1 });
 	uimouce->SetPos(vec3(640, 360, 0));
 
 
-		//ピストル画像の設定
-	size_t SelectImg = engine.AddUILayer("Res/Select.tga", GL_LINEAR, 10);
+	//ピストル画像の設定
+	size_t SelectImg = engine.AddUILayer("Res/UI/Select.tga", GL_LINEAR, 10);
 	Select = engine.CreateUI<GameObject>(SelectImg, "hp", 0, 300);
 	Select->AddSprite({ 0,0,1,1 });
 	Select->SetPos(vec3{ 70,546,0 });
 	
 	//武器フレーム画像の配置
-	size_t WeaponFrameImg = engine.AddUILayer("Res/WeaponFrame.tga", GL_LINEAR, 10);
+	size_t WeaponFrameImg = engine.AddUILayer("Res/UI/WeaponFrame.tga", GL_LINEAR, 10);
 	for (int i = 0; i < 3; i++)
 	{
 		GameObjectPtr WeaponFrame = engine.CreateUI<GameObject>(WeaponFrameImg, "hp", 0, 300);
@@ -111,28 +109,41 @@ bool TutorialScene::Initialize(Engine& engine)
 		WeaponFrame->SetPos(vec3{ 70.0f + UIMARGINE * i,546,0 });
 	}
 
+	//武器を持った時に背景を半透明にする
+	size_t HalfImg = engine.AddUILayer("Res/UI/half.tga", GL_LINEAR, 10);
+	for (int i = 0; i < 3; ++i)
+	{
+		Half[i] = engine.CreateUI<GameObject>(HalfImg, "select", 0, 300);
+		Half[i]->AddSprite({ 0,0,1,1 });
+		Half[i]->SetPos(vec3{ 70.0f + UIMARGINE * i,546,0 });
+		Half[i]->SetAlpha(0);
+	}
+
+	//ピストルは最初から持ってるので
+	Half[0]->SetAlpha(1);
+
 	//ピストル画像の設定
-	size_t PistoleImg = engine.AddUILayer("Res/Pistole.tga", GL_LINEAR, 10);
+	size_t PistoleImg = engine.AddUILayer("Res/UI/Pistole.tga", GL_LINEAR, 10);
 	Pistole = engine.CreateUI<GameObject>(PistoleImg, "hp", 0, 300);
 	Pistole->AddSprite({ 0,0,1,1 });
 	Pistole->SetPos(vec3{ 70,546,0 });
 
 	//アサルト画像の設定
-	size_t AssaultImg = engine.AddUILayer("Res/Assault.tga", GL_LINEAR, 10);
+	size_t AssaultImg = engine.AddUILayer("Res/UI/Assault.tga", GL_LINEAR, 10);
 	Assault = engine.CreateUI<GameObject>(AssaultImg, "hp", 0, 300);
 	Assault->AddSprite({ 0,0,1,1 });
 	Assault->SetPos(vec3{ 220,546,0 });
 	Assault->SetAlpha(0);
 
 	//ショットガン画像の設定
-	size_t ShotGunImg = engine.AddUILayer("Res/ShotGun.tga", GL_LINEAR, 10);
+	size_t ShotGunImg = engine.AddUILayer("Res/UI/ShotGun.tga", GL_LINEAR, 10);
 	ShotGun = engine.CreateUI<GameObject>(ShotGunImg, "hp", 0, 300);
 	ShotGun->AddSprite({ 0,0,1,1 });
 	ShotGun->SetPos(vec3{ 370,546,0 });
 	ShotGun->SetAlpha(0);
 
 	//フェードインをする
-	engine.SetFadeRule("Res/fade_rule.tga");
+	engine.SetFadeRule("Res/Fade/fade_rule.tga");
 	engine.StartFadeIn();
 
 
@@ -154,7 +165,7 @@ bool TutorialScene::Initialize(Engine& engine)
 	for (int i = 0; i < 3; i++)
 	{
 		auto ParticleObje = engine.Create<ItemObject>(
-			"particle explosion", vec3{ -10.0f + i * 10.0f,1.0f,356.0f });
+			"particle explosion", vec3{ -10.0f + i * 10.0f,1.0f,310.0f });
 		ParticleObje->player = PlayerObj;	//対象の設a定
 		ParticleObje->SetSpot(i);		//強化する部位の設定
 
@@ -166,7 +177,7 @@ bool TutorialScene::Initialize(Engine& engine)
 		auto ps = ParticleObje->AddComponent<ParticleSystem>();
 		ps->Emitters.resize(1);
 		auto& emitter = ps->Emitters[0];
-		emitter.ep.ImagePath = "Res/face.tga";
+		emitter.ep.ImagePath = "Res/UI/face.tga";
 		emitter.ep.Duration = 0.5f;				//放出時間
 		emitter.ep.EmissionsPerSecond = 10;	//秒間放出数
 		emitter.ep.RandomizeRotation = 1;		//角度をつける
@@ -289,6 +300,9 @@ void TutorialScene::UIUpdate()
 	//一番左の定位置
 	vec3 Pos = vec3{ 70,546,0 };
 
+	const float NormalSize = 1.0f;	//通常サイズ
+	const float MinimamSize = 0.6f;	//小さいサイズ
+
 	switch (PlayerObj->GetShotStyle())
 	{
 	case 0:
@@ -299,6 +313,12 @@ void TutorialScene::UIUpdate()
 		Pistole->SetAlpha(1.0f);
 		Assault->SetAlpha(0.5f);
 		ShotGun->SetAlpha(0.5f);
+
+		Pistole->SetScale(vec3(NormalSize));
+		//選択されていないものはサイズを小さくする
+		Assault->SetScale(vec3(MinimamSize));
+		ShotGun->SetScale(vec3(MinimamSize));
+
 		break;
 
 	case 1:
@@ -309,6 +329,11 @@ void TutorialScene::UIUpdate()
 		Pistole->SetAlpha(0.5f);
 		Assault->SetAlpha(1.0f);
 		ShotGun->SetAlpha(0.5f);
+
+		Assault->SetScale(vec3(NormalSize));
+		//選択されていないものはサイズを小さくする
+		Pistole->SetScale(vec3(MinimamSize));
+		ShotGun->SetScale(vec3(MinimamSize));
 
 		break;
 
@@ -321,6 +346,11 @@ void TutorialScene::UIUpdate()
 		Assault->SetAlpha(0.5f);
 		ShotGun->SetAlpha(1.0f);
 
+		ShotGun->SetScale(vec3(NormalSize));
+		//選択されていないものはサイズを小さくする
+		Pistole->SetScale(vec3(MinimamSize));
+		Assault->SetScale(vec3(MinimamSize));
+
 		break;
 	default:
 		break;
@@ -329,11 +359,20 @@ void TutorialScene::UIUpdate()
 	//プレイヤーの武器の取得状況に合わせて透明度を変える
 	if (!PlayerObj->GetShooterFlg())
 	{
-		Assault->SetAlpha(0.0f);
+		Assault->SetAlpha(0.0f);	//持ってない
 	}
+	else
+	{
+		Half[1]->SetAlpha(1);		//持ってる
+	}
+
 	if (!PlayerObj->GetShotGunFlg())
 	{
-		ShotGun->SetAlpha(0.0f);
+		ShotGun->SetAlpha(0.0f);	//持ってない
+	}
+	else
+	{
+		Half[2]->SetAlpha(1);		//持ってる
 	}
 
 

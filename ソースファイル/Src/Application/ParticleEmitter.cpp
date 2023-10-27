@@ -265,7 +265,7 @@ ParticleManager::ParticleManager(size_t maxParticleCount)
 	const ParticleVertex vertexData[] = {
 		{-0.5f, -0.5f, 0, 1},
 		{ 0.5f, -0.5f, 1, 1},
-		{-0.5f,  0.5f, 1, 0},
+		{ 0.5f,  0.5f, 1, 0},
 		{-0.5f,  0.5f, 0, 0},
 	};
 
@@ -296,7 +296,7 @@ ParticleManager::ParticleManager(size_t maxParticleCount)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	program = ProgramPipeline::Create("Res/particle.vert", "Res/particle.frag");
+	program = ProgramPipeline::Create("Res/Shader/particle.vert", "Res/Shader/particle.frag");
 	ssbo = MappedBufferObject::Create(maxParticleCount * sizeof(ParticleData),
 		GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
 

@@ -36,8 +36,8 @@ public:
 		{
 
 			//フェードアウトを開始
-			e->SetFadeRule("Res/fade_rule.tga");
-			e->SetFadeColor("Res/fade_color.tga");
+			e->SetFadeRule("Res/Fade/fade_rule.tga");
+			e->SetFadeColor("Res/Fade/fade_color.tga");
 			e->StartFadeOut();	//フェードする
 
 		}

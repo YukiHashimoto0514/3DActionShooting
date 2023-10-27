@@ -7,7 +7,8 @@
 #include <vector>
 
 //プログラムパイプラインを作成する
-//@param filenameVS 頂点シェーダーファイル名
+//@param filenameVS 
+// シェーダーファイル名
 //@param filenameFS フラグメントシェーダー名
 //
 //@return 作成したプログラムパイプラインへのポインター

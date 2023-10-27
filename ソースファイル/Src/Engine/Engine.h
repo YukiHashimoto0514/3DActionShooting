@@ -216,7 +216,7 @@ private:
 	void DrawBloomEffect();//ブルームエフェクト描画用関数
 
 	GLFWwindow* window = nullptr;				//ウィンドウオブジェクト
-	const std::string title = "Last Trigger";	//ウィンドウタイトル
+	const std::string title = "Monster Panic";	//ウィンドウタイトル
 
 	GLuint vs = 0;					//頂点シェーダの管理番号
 	GLuint fs = 0;					//フラグメントシェーダ管理番号

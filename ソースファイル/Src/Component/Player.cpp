@@ -42,25 +42,17 @@ void Player::Update(float deltaTime)
 	//通常攻撃にする
 	if (engine->GetKey(GLFW_KEY_1))
 	{
-		ShotStyle = 0;
+		SelectShot(0);
 	}
 
-	//シューターが使えるようになっていたら
-	if (ShooterFlg)
+	if (engine->GetKey(GLFW_KEY_2))
 	{
-		if (engine->GetKey(GLFW_KEY_2))
-		{
-			ShotStyle = 1;
-		}
+		SelectShot(1);
 	}
 
-	//ショットガンを使えるようになっていたら
-	if (ShotGunFlg)
+	if (engine->GetKey(GLFW_KEY_3))
 	{
-		if (engine->GetKey(GLFW_KEY_3))
-		{
-			ShotStyle = 2;
-		}
+		SelectShot(2);
 	}
 
 
@@ -81,13 +73,21 @@ void Player::TakeDamage(GameObject& other, const Damage& damage)
 		if (this->GetHP() <= 0)
 		{
 			//フェードアウトを開始
-			engine->SetFadeRule("Res/fade_rule4.tga");
-			engine->SetFadeColor("Res/fade_colorR.tga");
+			engine->SetFadeRule("Res/Fade/fade_rule4.tga");
+			engine->SetFadeColor("Res/Fade/fade_colorR.tga");
 			engine->StartFadeOut(2.0f);	//2秒かけてフェードする
 
 			//自身の当たり判定を消す
 			this->colliderList.clear();
 		}
+	}
+}
+
+void Player::OnCollision(GameObject& object)
+{
+	if (object.name == "Rock")
+	{
+		NearFlg = true;
 	}
 }
 
@@ -138,7 +138,6 @@ void Player::Move(float deltaTime)
 		speed = MoveSpeed * 0.7f;
 	}
 
-
 	//キー入力で移動させる
 	if (engine->GetKey(GLFW_KEY_W))
 	{
@@ -175,9 +174,6 @@ void Player::Shot(float deltaTime)
 			return;
 		}
 
-		//射撃音を鳴らす
-		Audio::PlayOneShot(SE::playerShot, 0.2f);
-
 		switch (ShotStyle)
 		{
 		case 0://一発が重いやつ(射程が長い)
@@ -209,13 +205,16 @@ void Player::Shot(float deltaTime)
 			//ダメージを与える相手の設定
 			auto da = bullet->AddComponent<DamageSource>();
 			da->targetName = "enemy";
-			da->amount = ShotDamage * 2.0f;	//ダメージ調整
+			da->amount = ShotDamage;	//ダメージ調整
+
+		//射撃音を鳴らす
+			Audio::PlayOneShot(SE::playerShot, 0.2f);
 
 			break;
 		}
 		case 1://連射速度が速い
 		{
-			ShotCoolTime = this->ShotInterval - 1.5f;//射撃感覚の設定
+			ShotCoolTime = this->ShotInterval - 0.3f;//射撃感覚の設定
 
 			//弾の生成
 			auto bullet = engine->Create<GameObject>("bullet");
@@ -232,6 +231,8 @@ void Player::Shot(float deltaTime)
 			bulletRenderer->materials.push_back(
 				std::make_shared<Mesh::Material>(*bulletRenderer->mesh->materials[0]));
 
+			bulletRenderer->materials[0]->baseColor = vec4{ 0.2f,0.3f,4.0f,1 };
+
 			//当たり判定の設定
 			auto bulletCollider = bullet->AddComponent<SphereCollider>();
 			bulletCollider->sphere.Center = bulletRenderer->translate;
@@ -243,14 +244,17 @@ void Player::Shot(float deltaTime)
 			//ダメージを与える相手の設定
 			auto da = bullet->AddComponent<DamageSource>();
 			da->targetName = "enemy";
-			da->amount = ShotDamage;
+			da->amount = ShotDamage * 0.6f;//ダメージ調整
 			da->isOnce = true;
+
+			//射撃音を鳴らす
+			Audio::PlayOneShot(SE::playerShot, 0.2f);
 
 			break;
 		}
 		case 2://ショットがん的な
 		{
-			ShotCoolTime = this->ShotInterval;//射撃感覚の設定
+			ShotCoolTime = this->ShotInterval + 0.5f;//射撃感覚の設定
 
 			for (int i = 0; i < 10; ++i)
 			{
@@ -268,6 +272,7 @@ void Player::Shot(float deltaTime)
 				//個別に色を変更できるように、マテリアルのコピーを作成
 				bulletRenderer->materials.push_back(
 					std::make_shared<Mesh::Material>(*bulletRenderer->mesh->materials[0]));
+				bulletRenderer->materials[0]->baseColor = vec4{ 3,2,0.2f,1 };
 
 				//当たり判定の設定
 				auto bulletCollider = bullet->AddComponent<SphereCollider>();
@@ -280,9 +285,14 @@ void Player::Shot(float deltaTime)
 				//ダメージを与える相手の設定
 				auto da = bullet->AddComponent<DamageSource>();
 				da->targetName = "enemy";
-				da->amount = ShotDamage * 0.8f;	//ダメージを調整
+				da->amount = ShotDamage * 0.5f;	//ダメージを調整
 				da->isOnce = true;
+
+
 			}
+
+			//射撃音を鳴らす
+			Audio::PlayOneShot(SE::ShotGun, 0.5f);
 			break;
 		}
 		default:
@@ -298,7 +308,7 @@ void Player::Fall(float deltaTime)
 	//ジャンプ中じゃないなら(自然落下)
 	if (!this->GetJump())
 	{
-		this->AddPosition(vec3(0, -0.05f - FallTimer * FallTimer * 9.8f * deltaTime, 0));
+		this->AddPosition(vec3(0, -0.06f - FallTimer * FallTimer * 9.8f * deltaTime, 0));
 
 		this->v0 = 0;
 		JumpTimer = 0;
@@ -327,6 +337,41 @@ void Player::Fall(float deltaTime)
 		FallTimer = 0;
 		JumpTimer = 0;
 	}
+
+}
+
+void Player::SelectShot(int _shot)
+{
+
+	//選択している武器と同じなら無視
+	if (ShotStyle == _shot)
+	{
+		return;
+	}
+
+	//押された武器が使えるかどうかを確認
+	switch (_shot)
+	{
+	case 0:
+		break;
+	case 1:
+		if (!ShooterFlg)return;
+		break;
+
+	case 2:
+		if (!ShotGunFlg)return;
+
+		break;
+
+	default:
+		break;
+	}
+
+	//効果音を鳴らす
+	Audio::PlayOneShot(SE::WeaponSelect, 0.2f);
+
+	//武器を切り替える
+	ShotStyle = _shot;
 
 }
 

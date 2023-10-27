@@ -55,11 +55,6 @@ public:
 	//‰½‚É“–‚½‚Á‚Ä‚à’e‚Í‰ó‚ê‚é
 	virtual void OnCollision(GameObject& gameObject, GameObject& other)override
 	{
-		//‹Ê“¯‚Í–³‹
-		if (other.name == "bullet")
-		{
-			return;
-		}
 		gameObject.SetDeadFlg(true);
 
 	}

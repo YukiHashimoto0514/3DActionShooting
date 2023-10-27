@@ -43,6 +43,7 @@ private:
 
 	GameObjectPtr cameraobj;	//カメラ
 	GameObjectPtr Select;		//選択画像のオブジェクト
+	GameObjectPtr Half[3];		//背景の半透明のオブジェクト
 	GameObjectPtr Pistole;		//ピストル画像のオブジェクトを
 	GameObjectPtr Assault;		//アサルト画像のオブジェクトを
 	GameObjectPtr ShotGun;		//ショットガン画像のオブジェクトを
@@ -59,11 +60,11 @@ private:
 	double oldY = 0;	//マウスの昔の位置
 
 	float EnemyCreate = 0;	//エネミーを生成するクールタイム
-	float LimitTime = 180;	//残り時間
+	float LimitTime = 1;	//残り時間
 
 	const float UIMARGINE = 150.0f;	//UI画像の幅
 
-	bool BossShow = false;//ボスが出現する(true=出現　false=未出現)
+	bool BossShow = false;//ボスが出現する(true=出現　false=未出現) 
 
 };
 

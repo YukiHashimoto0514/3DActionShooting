@@ -9,6 +9,13 @@
 
 using namespace VecMath;
 
+//どっちを選択しているか
+enum class Choose
+{
+	Game,	//ゲーム
+	Title,	//タイトル
+};
+
 //ゲームオーバーシーンコンポーネント
 class GameOverScene :public Scene
 {
@@ -25,9 +32,12 @@ private:
 
 	int Action = 0;
 	bool ClickEnter = false;//エンターを押したかどうか
-	GameObjectPtr uiPressEnter;
+	GameObjectPtr uiPressSpace;
 	GameObjectPtr uiGameover;
+	GameObjectPtr uiTitle;		//たいとるテキスト
+	GameObjectPtr uiGameStart;	//メインゲームテキスト
 
+	Choose select = Choose::Game;
 };
 
 

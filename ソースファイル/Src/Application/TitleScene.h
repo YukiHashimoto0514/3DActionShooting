@@ -34,7 +34,8 @@ private:
 	GameObjectPtr uiTutorial;	//チュートリアルテキスト
 	GameObjectPtr uiGameStart;	//メインゲームテキスト
 
-	GameObjectPtr uiTitle;
+	GameObjectPtr uiMonster;	//タイトル画像
+	GameObjectPtr uiPanic;		//タイトル画像
 
 	//最初にチュートリアルを選択しておく
 	Select select = Select::Tutorial;

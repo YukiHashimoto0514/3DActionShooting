@@ -35,6 +35,7 @@ public:
 	GameObjectPtr Pistole;		//ピストル画像のオブジェクトを
 	GameObjectPtr Assault;		//アサルト画像のオブジェクトを
 	GameObjectPtr ShotGun;		//ショットガン画像のオブジェクトを
+	GameObjectPtr Half[3];		//背景の半透明のオブジェクト
 
 	double MouceX, MouceY;		//マウスのポジション
 	double oldX, oldY;			//マウスの昔の位置

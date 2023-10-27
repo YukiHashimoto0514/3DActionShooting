@@ -25,9 +25,9 @@ bool LoadScene::Initialize(Engine& engine)
 	engine.RemoveParticleEmitterAll();
 
 	//UIレイヤーを作成
-	const size_t bgLayer = engine.AddUILayer("Res/title_bg.tga", GL_LINEAR, 10);
-	const size_t LoadLayer = engine.AddUILayer("Res/LoadPlanet.tga", GL_LINEAR, 10);
-	const size_t textLayer = engine.AddUILayer("Res/font_04_2.tga", GL_LINEAR, 10);
+	const size_t bgLayer = engine.AddUILayer("Res/UI/title_bg.tga", GL_LINEAR, 10);
+	const size_t LoadLayer = engine.AddUILayer("Res/UI/LoadPlanet.tga", GL_LINEAR, 10);
+	const size_t textLayer = engine.AddUILayer("Res/UI/font_04_2.tga", GL_LINEAR, 10);
 
 	////背景画像(真っ黒)
 	auto uiBackground = engine.CreateUI<GameObject>(
@@ -57,8 +57,8 @@ bool LoadScene::Initialize(Engine& engine)
 	uiPressSpace = engine.CreateUI<GameObject>(textLayer, "Press Space", x, 100);
 	auto textGameOver = uiPressSpace->AddComponent<Text>();
 	textGameOver->SetText(strToPlay, 2);
-	uiPressSpace->SetPos(vec3(0, -100, 0));
-
+	//uiPressSpace->SetPos(vec3(0, -100, 0));
+	uiPressSpace->SetAlpha(0);
 	//BGMを再生
 	Audio::Play(AudioPlayer::bgm, BGM::load, 1, true);
 	engine.SlowSpeed = 1;
@@ -126,7 +126,7 @@ void LoadScene::Update(Engine& engine, float deltaTime)
 			if (!Push)
 			{
 				Audio::PlayOneShot(SE::Click2, 0.2f);		//効果音を再生
-				engine.SetFadeRule("Res/fade_rule3.tga");
+				engine.SetFadeRule("Res/Fade/fade_rule3.tga");
 				engine.StartFadeOut();	//フェードをする
 				Push = true;
 			}
@@ -166,19 +166,20 @@ void LoadScene::Update(Engine& engine, float deltaTime)
 				Loadflg = true;
 
 				//uiPressを表示
-				uiPressSpace->SetPos(vec3(180, 100, 0));
+				//uiPressSpace->SetPos(vec3(180, 100, 0));
+				uiPressSpace->SetAlpha(1);
 
 				//LoadStrを非表示に
 				Loadstr->SetPos(vec3(0, -100, 0));
 
 				//新しいテキストの追加
-				const size_t textLayer = engine.AddUILayer("Res/font_04_2.tga", GL_LINEAR, 10);
+				const size_t textLayer = engine.AddUILayer("Res/UI/font_04_2.tga", GL_LINEAR, 10);
 
 				const char load[] = "Let's GO!!!";
-				const float fontSizeX2 = 15;
+				const float fontSizeX2 = 30;
 				const float loadx =
 					640 - static_cast<float>(std::size(load) - 1) * fontSizeX2;
-				auto loadstr = engine.CreateUI<GameObject>(textLayer, "text", loadx, 600);
+				auto loadstr = engine.CreateUI<GameObject>(textLayer, "text", loadx, 580);
 				auto textLoad2 = loadstr->AddComponent<Text>();
 
 				textLoad2->SetText(load, 4);

@@ -26,15 +26,12 @@ public:
 	//コンストラクタ
 	Boss()
 	{
-		MaxHP = this->GetHP();
 		State = Routine::Search;
 	};
 	virtual ~Boss() = default;	//デストラクタ
 
 	virtual void Update(float deltaTime)override;
 	virtual void TakeDamage(GameObject& other, const Damage& damage)override;
-
-
 
 private:
 
@@ -53,12 +50,11 @@ private:
 
 	int BoxCount = 5;		//攻撃で作る箱の数
 
-	float MaxHP = 10;		//最大HP
+	float MaxHP = 180;		//最大HP
 	float TakeTime = 0;		//イージングの時に使用する時間
 	float MoveTimer = 0;	//行動時間
 	float WaitTime = 0;		//待機時間
 	float DeadTimer = 0;	//死んだ時から計測
-
 	vec3 beforePos = vec3(0);
 	vec3 targetPos = vec3(0);
 };

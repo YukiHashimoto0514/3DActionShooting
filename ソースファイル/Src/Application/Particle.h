@@ -153,8 +153,7 @@ struct ParticleEmitterParameter
 		struct Box
 		{
 			VecMath::vec3 size = { 1,1,1 };//’¼•û‘Ì‚ÌƒTƒCƒY
-		};
-		Box box = { VecMath::vec3(1) };
+		}box;
 	};
 }; 
 

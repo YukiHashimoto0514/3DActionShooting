@@ -34,7 +34,16 @@ public:
 		}
 
 
-		CrateEffect(gameObject);
+
+		if (!KingFlg)
+		{
+			CrateEffect(gameObject);
+		}
+		else
+		{
+			KingEffect(gameObject);
+		}
+
 
 	}
 
@@ -44,6 +53,7 @@ public:
 	const int Green = 1;
 	const int Blue = 2;
 
+	bool KingFlg = false;	//王様スライムかどうか
 private:
 
 	void CrateEffect(GameObject& gameObject)
@@ -66,7 +76,7 @@ private:
 		auto ps = ParticleObject->AddComponent<ParticleSystem>();
 		ps->Emitters.resize(1);
 		auto& emitter = ps->Emitters[0];
-		emitter.ep.ImagePath = "Res/face.tga";
+		emitter.ep.ImagePath = "Res/UI/face.tga";
 		emitter.ep.Duration = 0.5f;				//放出時間
 		emitter.ep.EmissionsPerSecond = 10;	//秒間放出数
 		emitter.ep.RandomizeRotation = 1;		//角度をつける
@@ -98,6 +108,42 @@ private:
 		auto patcollider = ParticleObject->AddComponent<SphereCollider>();
 		patcollider->sphere.Center = vec3(0);
 		patcollider->sphere.Radius = 1.0f;
+	}
+
+	void KingEffect(GameObject& gameObject)
+	{
+		//パーティクルによる爆発
+		auto ParticleObject = gameObject.engine->Create<ItemObject>(
+			"particle explosion", gameObject.GetPos());
+		ParticleObject->player = target;	//対象の設定
+		ParticleObject->SetSpot(7);		//強化する部位の設定
+
+		auto ps = ParticleObject->AddComponent<ParticleSystem>();
+		ps->Emitters.resize(1);
+		auto& emitter = ps->Emitters[0];
+		emitter.ep.ImagePath = "Res/UI/face.tga";
+		emitter.ep.Duration = 0.5f;				//放出時間
+		emitter.ep.EmissionsPerSecond = 10;	//秒間放出数
+		emitter.ep.RandomizeRotation = 1;		//角度をつける
+		emitter.ep.RandomizeDirection = 0;
+		emitter.ep.RandomizeSize = 1;			//大きさをランダムに
+		emitter.pp.LifeTime = 0.4f;				//生存時間
+		emitter.pp.rotation.Set(90.0f, 0);
+
+		//乱数によって色を変える
+		emitter.pp.color.Set({ 20.0f, 10.0f, 25.5f, 1 }, { 1, 1, 1.5f, 0 });	//色付け
+		
+		emitter.pp.scale.Set({ 0.01f,0.01f }, { 0.5f,0.5f });	//サイズを徐々にへ変更させる
+		emitter.pp.radial.Set(0, 10);			//角度方向に速度をつける
+
+		emitter.ep.Loop = true;	//ループ再生させる
+
+
+		//コライダーを割り当てる
+		auto patcollider = ParticleObject->AddComponent<SphereCollider>();
+		patcollider->sphere.Center = vec3(0);
+		patcollider->sphere.Radius = 1.0f;
+
 	}
 
 
