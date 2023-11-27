@@ -145,12 +145,23 @@ void GameOverScene::Update(Engine& engine, float deltaTime)
 	//左右矢印を押すと選択が切り替わる
 	if (engine.GetKey(GLFW_KEY_LEFT) || engine.GetKey(GLFW_KEY_A))
 	{
+		if (select != Choose::Game)
+		{
+			Audio::PlayOneShot(SE::Click, 0.5f);	//効果音を再生
+			Timer = 3;
+		}
 		select = Choose::Game;
 		uiTitle->SetAlpha(1);
 
 	}
 	else if (engine.GetKey(GLFW_KEY_RIGHT) || engine.GetKey(GLFW_KEY_D))
 	{
+
+		if (select != Choose::Title)
+		{
+			Audio::PlayOneShot(SE::Click, 0.5f);	//効果音を再生
+			Timer = 3;
+		}
 		select = Choose::Title;
 		uiGameStart->SetAlpha(1);
 
@@ -162,7 +173,7 @@ void GameOverScene::Update(Engine& engine, float deltaTime)
 		//一回もクリックしていなかったら
 		if (!ClickEnter)
 		{
-			Audio::PlayOneShot(SE::Click2, 0.2f);	//効果音を再生
+			Audio::PlayOneShot(SE::enemyExplosionD, 0.5f);	//効果音を再生
 			engine.SetFadeRule("Res/Fade/fade_rule2.tga");
 			engine.StartFadeOut();
 			ClickEnter = true;

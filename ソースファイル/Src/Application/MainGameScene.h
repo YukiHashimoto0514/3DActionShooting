@@ -7,6 +7,7 @@
 #include <vector>
 #include "../Engine/Engine.h"
 #include "../Component/TimeLimit.h"
+#include "../Component/StateUI.h"
 
 //先行宣言
 class Player;
@@ -47,6 +48,7 @@ private:
 	GameObjectPtr Pistole;		//ピストル画像のオブジェクトを
 	GameObjectPtr Assault;		//アサルト画像のオブジェクトを
 	GameObjectPtr ShotGun;		//ショットガン画像のオブジェクトを
+	GameObjectPtr BossUI;		//ショットガン画像のオブジェクトを
 
 	//乱数
 	std::random_device rd;
@@ -54,13 +56,16 @@ private:
 	TimeLimitPtr TimeManager;	//制限時間を測るマネージャー
 	GameObjectPtr HPBarImg;		//HPバーの画像
 
+	StateUIPtr StateManager[2];	//強化状態マネージャー
+	
+
 	double MouceX = 0;	//マウスのポジション
 	double MouceY = 0;	//マウスのポジション
 	double oldX = 0;	//マウスの昔の位置
 	double oldY = 0;	//マウスの昔の位置
 
 	float EnemyCreate = 0;	//エネミーを生成するクールタイム
-	float LimitTime = 1;	//残り時間
+	float LimitTime = 150;	//残り時間
 
 	const float UIMARGINE = 150.0f;	//UI画像の幅
 

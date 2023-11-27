@@ -35,7 +35,7 @@ public:
 		fovScaleX = aspect * fovScaleY;
 	}
 
-	float near = 1;			//近平面
+	float near = 0.5f;			//近平面
 	float far = 2000;		//遠平面
 	float fovY = 60;		//視野角
 	float aspect = 9.0f / 16.0f;	//アスペクト比

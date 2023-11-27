@@ -84,7 +84,7 @@ bool TitleScene::Initialize(Engine& engine)
 	uiTutorial->SetAlpha(0);
 	uiGameStart->SetAlpha(0);
 
-	Audio::PlayOneShot(SE::Wind, 0.7f);
+	Audio::PlayOneShot(SE::Wind, 1.0f);
 	//BGM‚ðÄ¶
 	Audio::Play(AudioPlayer::bgm, BGM::title, 1, true);
 
@@ -155,7 +155,7 @@ void TitleScene::Update(Engine& engine, float deltaTime)
 	{
 		if (!Click)
 		{
-			Audio::PlayOneShot(SE::Click2, 0.2f);	//Œø‰Ê‰¹‚ðÄ¶
+			Audio::PlayOneShot(SE::enemyExplosionD, 0.5f);	//Œø‰Ê‰¹‚ðÄ¶
 			Click = true;
 			engine.StartFadeOut();
 		}
@@ -178,13 +178,25 @@ void TitleScene::Update(Engine& engine, float deltaTime)
 	//¶‰E–îˆó‚ð‰Ÿ‚·‚Æ‘I‘ð‚ªØ‚è‘Ö‚í‚é
 	if (engine.GetKey(GLFW_KEY_UP)||engine.GetKey(GLFW_KEY_W)|| engine.GetKey(GLFW_KEY_A))
 	{
+		if (select != Select::Tutorial)
+		{
+			Audio::PlayOneShot(SE::Click, 0.5f);
+			Timer = 3;
+		}
 		select = Select::Tutorial;
 		uiGameStart->SetAlpha(1);
 	}
 	else if (engine.GetKey(GLFW_KEY_DOWN) || engine.GetKey(GLFW_KEY_S) | engine.GetKey(GLFW_KEY_D))
 	{
+		if (select != Select::Game)
+		{
+			Audio::PlayOneShot(SE::Click, 0.5f);
+			Timer = 3;
+		}
+
 		select = Select::Game;
 		uiTutorial->SetAlpha(1);
+
 	}
 
 }

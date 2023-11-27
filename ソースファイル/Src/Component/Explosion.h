@@ -37,11 +37,11 @@ public:
 		emitter.ep.RandomizeSize = 1;			//大きさをランダムに
 		emitter.pp.LifeTime = 0.4f;				//生存時間
 		emitter.pp.color.Set({ 5, 1, 0.5f, 1 }, { 1, 2, 1.5f, 0 });	//色付け
-		emitter.pp.scale.Set({ 0.05f,0.05f }, { 0.001f,0.001f });	//サイズを徐々にへ変更させる
+		emitter.pp.scale.Set({ 0.03f,0.03f }, { 0.001f,0.001f });	//サイズを徐々にへ変更させる
 		//emitter.ep.Shape = ParticleEmitterShape::box;]
 
 		//効果音を鳴らす
-		Audio::PlayOneShot(SE::enemyExplosionD, 0.2f);
+		Audio::PlayOneShot(SE::enemyExplosionL, 0.5f);
 
 	}
 

@@ -9,6 +9,7 @@
 #include "../Application/EasyAudio.h"
 #include "../Application/TitleScene.h"
 #include "../Application/MainGameScene.h"
+#include"../Component/Fall.h"
 #include "../Component/Goal.h"
 #include "../Component/Warp.h"
 #include "../Component/Health.h"
@@ -107,13 +108,24 @@ struct WorldCollider
 					AddPosition(-v);
 				}
 				
+				
+				if (other.gameObject->name == "bullet")
+				{
+					//反射ベクトルを計算し、代入
+					vec3 reflection = -dot(other.gameObject->GetForward(), -cp.Normal) * -cp.Normal * 2 + other.gameObject->GetForward();
+					
+					LOG("%f,%f,%f", reflection.x, reflection.y, reflection.z);
+					other.gameObject->SetRef(reflection);
+					continue;
+				}
+
+
 				//法線で衝突した角度を計算
 				float theta = dot(cp.Normal, vec3(0, 1, 0));
 				
 				//大体垂直だったら
-				if (theta <= -0.9f)
+				if (theta <= -0.5f)
 				{
-					
 					gameObject->only = 4;		//地面判定にするフレーム数
 					other.gameObject->only = 4;	//地面判定にするフレーム数
 					other.gameObject->SetJumpFlg(false);//ジャンプできるようにする
@@ -367,7 +379,7 @@ GameObjectList Engine::LoadGameObjectMap(const char* filename,
 			//コライダーを割り当てる
 			auto Gcollider = gameObject->AddComponent<BoxCollider>();
 			Gcollider->box.Scale = renderer->scale;
-
+			gameObject->AddComponent<Fall>();
 			gameObject->SetMoveFlg(true);
 		}
 		else if (Tag == "FallFloor")//落下床の場合
@@ -637,7 +649,7 @@ int Engine::Initialize()
 		"Res/Shader/standard_3D.vert", "Res/Shader/standard_3D.frag");
 
 	//影用オブジェクトを作成
-	fboShadow = FramebufferObject::Create(1024, 1024, FboType::depth);
+	fboShadow = FramebufferObject::Create(4096, 4096, FboType::depth);
 	progShadow = ProgramPipeline::Create("Res/Shader/shadow.vert", "Res/Shader/shadow.frag");
 
 	//スカイボックス用オブジェクトを生成

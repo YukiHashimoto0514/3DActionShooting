@@ -30,17 +30,20 @@ namespace SE
 	inline constexpr char playerShot[] = "Res/Audio/shoot.wav";			//弾の発射音
 	inline constexpr char ShotGun[]		= "Res/Audio/ShotGun.wav";		//弾の発射音
 	inline constexpr char Wind[]		= "Res/Audio/Wind.mp3";			//風の音
+	inline constexpr char playerDead[]		= "Res/Audio/Dead.mp3";			//プレイヤーが死んだ時の音
 	inline constexpr char playerExplosion[] = "Res/Audio/BombL.wav";	//自機の爆発音
 	inline constexpr char enemyExplosionS[] = "Res/Audio/Slime.mp3";	//スライムのし
 	inline constexpr char enemyExplosionD[] = "Res/Audio/ExpS.wav";		//ドローンの爆発
 	inline constexpr char enemyExplosionL[] = "Res/Audio/ExpL.wav";		//爆発（大）
 	inline constexpr char BossExplosion[]   = "Res/Audio/BossExp.wav";	//ボスの爆発音
 
+	inline constexpr char Jump[]   = "Res/Audio/Jump.mp3";	//ボスの爆発音
+	inline constexpr char Open[]   = "Res/Audio/Treasure.mp3";	//宝箱を空ける音
+
 	inline constexpr char WeaponSelect[] = "Res/Audio/WeaponChange.mp3";//武器の切り替え音
 	inline constexpr char Click[]		= "Res/Audio/Coin.wav";			//決定音
 	inline constexpr char Click2[]      = "Res/Audio/Coin2.wav";		//決定音
 	inline constexpr char powerup[]     = "Res/Audio/PowerUp.wav";		//アイテムの取得音
-	inline constexpr char lasttrigger[] = "Res/Audio/LastTrigger.mp3";	//必殺技の音
 
 
 }

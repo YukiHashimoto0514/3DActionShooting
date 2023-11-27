@@ -39,6 +39,15 @@ void Player::Update(float deltaTime)
 
 	//~~雑実装~~\\
 	
+	if (engine->GetKey(GLFW_KEY_LEFT_SHIFT))
+	{
+		engine->SlowSpeed = 0.5f;
+	}
+	else
+	{
+		engine->SlowSpeed = 1.0f;
+	}
+
 	//通常攻撃にする
 	if (engine->GetKey(GLFW_KEY_1))
 	{
@@ -79,6 +88,9 @@ void Player::TakeDamage(GameObject& other, const Damage& damage)
 
 			//自身の当たり判定を消す
 			this->colliderList.clear();
+			Audio::PlayOneShot(SE::playerDead, 0.8f);
+
+			return;
 		}
 	}
 }
@@ -89,6 +101,7 @@ void Player::OnCollision(GameObject& object)
 	{
 		NearFlg = true;
 	}
+
 }
 
 void Player::Jump(float deltaTime)
@@ -100,7 +113,7 @@ void Player::Jump(float deltaTime)
 		{
 			if (engine->GetKey(GLFW_KEY_SPACE))
 			{
-
+				Audio::PlayOneShot(SE::Jump, 0.8f);
 				this->v0 = 10;
 				this->SetJumpFlg(true);
 			}
@@ -184,6 +197,7 @@ void Player::Shot(float deltaTime)
 			auto bullet = engine->Create<GameObject>("bullet");
 			auto move = bullet->AddComponent<BulletMove>();
 			move->SetPlayerinfo(this, *bullet);
+			move->SetBound(true);
 
 			//見た目の設定
 			auto bulletRenderer = bullet->AddComponent<MeshRenderer>();
@@ -193,9 +207,10 @@ void Player::Shot(float deltaTime)
 			//個別に色を変更できるように、マテリアルのコピーを作成
 			bulletRenderer->materials.push_back(
 				std::make_shared<Mesh::Material>(*bulletRenderer->mesh->materials[0]));
-
+			bulletRenderer->materials[0]->baseColor = vec4{ 2,2,2,1 };
+			bulletRenderer->materials[0]->receiveShadows = false;
 			//当たり判定の設定
-			auto bulletCollider = bullet->AddComponent<SphereCollider>();
+			auto bulletCollider = bullet->AddComponent<SphereCollider>(); 
 			bulletCollider->sphere.Center = bulletRenderer->translate;
 			bulletCollider->sphere.Radius = std::max({
 				bulletRenderer->scale.x,
@@ -230,7 +245,7 @@ void Player::Shot(float deltaTime)
 			//個別に色を変更できるように、マテリアルのコピーを作成
 			bulletRenderer->materials.push_back(
 				std::make_shared<Mesh::Material>(*bulletRenderer->mesh->materials[0]));
-
+			bulletRenderer->materials[0]->receiveShadows = false;
 			bulletRenderer->materials[0]->baseColor = vec4{ 0.2f,0.3f,4.0f,1 };
 
 			//当たり判定の設定
@@ -272,7 +287,8 @@ void Player::Shot(float deltaTime)
 				//個別に色を変更できるように、マテリアルのコピーを作成
 				bulletRenderer->materials.push_back(
 					std::make_shared<Mesh::Material>(*bulletRenderer->mesh->materials[0]));
-				bulletRenderer->materials[0]->baseColor = vec4{ 3,2,0.2f,1 };
+				bulletRenderer->materials[0]->baseColor = vec4{ 0.2f,3,1.2f,1 };
+				bulletRenderer->materials[0]->receiveShadows = false;
 
 				//当たり判定の設定
 				auto bulletCollider = bullet->AddComponent<SphereCollider>();
@@ -305,10 +321,28 @@ void Player::Shot(float deltaTime)
 
 void Player::Fall(float deltaTime)
 {
+
+
+	//空中なら
+	if (this->GetAir())
+	{
+		if (FallTimer > 0 && FallTimer <= 1)
+		{
+			FallTimer += 1;
+		}
+		FallTimer += deltaTime;
+	}
+	//空中じゃないなら
+	else
+	{
+		FallTimer = 0;
+		JumpTimer = 0;
+	}
+
 	//ジャンプ中じゃないなら(自然落下)
 	if (!this->GetJump())
 	{
-		this->AddPosition(vec3(0, -0.06f - FallTimer * FallTimer * 9.8f * deltaTime, 0));
+		this->AddPosition(vec3(0,  - FallTimer * FallTimer * 9.8f * deltaTime, 0));
 
 		this->v0 = 0;
 		JumpTimer = 0;
@@ -324,18 +358,6 @@ void Player::Fall(float deltaTime)
 		float FallPower = (UpPower - DownPower) * deltaTime;
 		this->AddPosition(vec3(0, FallPower, 0));
 
-	}
-
-	//空中なら
-	if (this->GetAir())
-	{
-		FallTimer += deltaTime;
-	}
-	//空中じゃないなら
-	else
-	{
-		FallTimer = 0;
-		JumpTimer = 0;
 	}
 
 }

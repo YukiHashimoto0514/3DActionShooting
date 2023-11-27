@@ -120,6 +120,10 @@ public:
 	{
 		return Position;
 	}
+	const vec3& GetReflection() const
+	{
+		return Reflection;
+	}
 	const vec3& GetRotation() const
 	{
 		return Rotation;
@@ -181,6 +185,11 @@ public:
 	{
 		Position = _pos;
 	}
+
+	void SetRef(vec3 _ref)
+	{
+		Reflection = _ref;
+	}
 	void SetScale(vec3 _scale)
 	{
 		Scale = _scale;
@@ -236,6 +245,7 @@ public:
 	std::vector<ColliderPtr> colliderList;
 private:
 	vec3 Position = { 0,0,0 };	//座標
+	vec3 Reflection = { 0,0,0 };//反射ベクトル
 	vec3 Forward = { 0,0,0 };	//正面の向き
 	vec3 Right = { 0,0,0 };		//右側の向き
 	vec3 Rotation = { 0,0,0 };	//回転

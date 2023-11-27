@@ -80,8 +80,8 @@ private:
 	float ShotDamage = 1.0f;	//与えるダメージ
 	float JumpTimer = 0;		//ジャンプで使うタイマー
 	float FallTimer = 0;		//落下中に使うタイマー
-	float MoveSpeed = 15.0f ;	//移動速度
-	float MaxHP = 5;			//最大HP
+	float MoveSpeed = 15.0f;	//移動速度
+	float MaxHP = 7.0f;			//最大HP
 	int ShotStyle = 0;			//射撃方法
 
 	bool ShotGunFlg = false;	//ショットガンを使用できるかどうか

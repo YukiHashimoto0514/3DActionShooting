@@ -126,7 +126,8 @@ namespace Mesh
 				if (program)
 				{
 					glProgramUniform4fv(program, 102, 1, &material.baseColor.x);
-					glProgramUniform2f(program, 103, material.specularPower, material.normalizeFactor);
+					glProgramUniform3f(program, 103,
+						material.specularPower, material.normalizeFactor, material.receiveShadows);
 				}
 
 				//GLコンテキストにテクスチャを割り当てる

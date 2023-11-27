@@ -117,6 +117,12 @@ void DeviationEnemy::Shot(float deltaTime)
 		enemyBulletRenderer->mesh = this->engine->LoadOBJ("Sphere");
 		enemyBulletRenderer->scale = vec3(0.5f);
 
+		//個別に色を変更できるように、マテリアルのコピーを作成
+		enemyBulletRenderer->materials.push_back(
+			std::make_shared<Mesh::Material>(*enemyBulletRenderer->mesh->materials[0]));
+		enemyBulletRenderer->materials[0]->baseColor = vec4{ 3,0.4f,1.2f,1 };
+		enemyBulletRenderer->materials[0]->receiveShadows = false;
+
 		//正面方向に進む
 		auto enemyMove = enemyBullet->AddComponent<EnemyBulletMove>();
 		enemyMove->SetOwnerinfo(this, *enemyBullet);

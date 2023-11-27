@@ -6,6 +6,8 @@
 #include "ParticleSystem.h"
 #include "../Component/Player.h"
 #include <stdio.h>
+#include "../Engine/AudioSettings.h"
+#include "../Application/EasyAudio.h"
 
 //宝箱コンポーネント
 class TreasureBox :public Component
@@ -58,6 +60,8 @@ public:
 				Target->SetShotGunFlg(true);
 				gameObject.componentList.clear();	//複数回当たらないようにする
 			}
+
+			Audio::PlayOneShot(SE::Open, 0.5f);
 		}
 	}
 

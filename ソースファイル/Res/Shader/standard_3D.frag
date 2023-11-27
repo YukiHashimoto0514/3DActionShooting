@@ -35,7 +35,7 @@ struct Material
 
 	//x:鏡面反射指数
 	//y:正規化係数
-	vec2 specularFactor;
+	vec3 specularFactorAndReceiveShadows;
 };
 layout(location=102) uniform Material material;
 
@@ -88,8 +88,15 @@ void main()
 	vec3 diffuse = directionalLight.color * theta * invPi;
 
 	//鏡面反射パラメータを取得
-	float specularPower = material.specularFactor.x;
-	float normalizeFactor = material.specularFactor.y;
+	float specularPower = material.specularFactorAndReceiveShadows.x;
+	float normalizeFactor = material.specularFactorAndReceiveShadows.y;
+	float receiveShadows = material.specularFactorAndReceiveShadows.z;
+
+	//周りからの影の影響を受けないようにする(ついでにライティングも)
+	if (receiveShadows <= 0)
+	{
+	  return;
+	}
 
 	//ライトとカメラの中間の向きを求める
 	vec3 cameraVector = normalize(cameraPosition - inposition);
@@ -104,10 +111,10 @@ void main()
 	vec3 ambient = outColor.rgb * ambientLight;
 
 	//光が届いている比率を計算								影を半透明にする
-	float shadow = texture(texDepth, inShadowPosition)* 0.5 + 0.5;
+	float shadow = texture(texDepth, inShadowPosition)* 0.75 + 0.25;
 
 	//拡散光と鏡面反射を合成する
-	float specularRatio = 0.04;	//鏡面反射の比率
+	float specularRatio = 0.04f;	//鏡面反射の比率
 	diffuse *= outColor.rgb * (1 - specularRatio);
 	specular *= specularRatio;
 	outColor.rgb = (diffuse + specular) * shadow + ambient;

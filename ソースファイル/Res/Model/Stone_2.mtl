@@ -1,0 +1,7 @@
+newmtl Stone
+Kd 0.9852941 0.9925389 0.9925389
+Ks 0.1838235 0.1851752 0.1851752
+map_Kd Stone(2048)_diffuse.tga
+map_Bump Stone(2048)_normals.tga
+illum 2
+

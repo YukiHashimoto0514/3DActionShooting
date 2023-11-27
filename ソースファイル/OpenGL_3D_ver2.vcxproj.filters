@@ -19,30 +19,59 @@
     <Filter Include="MikkTSpace">
       <UniqueIdentifier>{bf6db849-fbfc-4d0e-9556-39817ecb5e4c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{a29a2db9-e995-4410-ab1e-89f317f1898d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Res\gaussian_blur.frag" />
-    <None Include="Res\high_pass_filter.frag" />
-    <None Include="Res\shadow.frag" />
-    <None Include="Res\shadow.vert" />
-    <None Include="Res\standard_3D.frag" />
-    <None Include="Res\standard_3D.vert" />
-    <None Include="Res\up_sampling.frag" />
-    <None Include="Res\skybox.vert">
-      <Filter>リソース ファイル</Filter>
+    <None Include="Res\Shader\down_sampling.frag">
+      <Filter>Shader</Filter>
     </None>
-    <None Include="Res\skybox.frag">
-      <Filter>リソース ファイル</Filter>
+    <None Include="Res\Shader\fade.frag">
+      <Filter>Shader</Filter>
     </None>
-    <None Include="Res\particle.frag">
-      <Filter>リソース ファイル</Filter>
+    <None Include="Res\Shader\gaussian_blur.frag">
+      <Filter>Shader</Filter>
     </None>
-    <None Include="Res\particle.vert">
-      <Filter>リソース ファイル</Filter>
+    <None Include="Res\Shader\high_pass_filter.frag">
+      <Filter>Shader</Filter>
     </None>
-    <None Include="Res\fade.frag">
-      <Filter>リソース ファイル</Filter>
+    <None Include="Res\Shader\particle.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Res\Shader\particle.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Res\Shader\shadow.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Res\Shader\shadow.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Res\Shader\simple_2D.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Res\Shader\skybox.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Res\Shader\skybox.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Res\Shader\standard_2D.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Res\Shader\standard_2D.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Res\Shader\standard_3D.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Res\Shader\standard_3D.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Res\Shader\up_sampling.frag">
+      <Filter>Shader</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -319,6 +348,12 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Src\Component\TextMove.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Component\StateUI.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Component\Fall.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

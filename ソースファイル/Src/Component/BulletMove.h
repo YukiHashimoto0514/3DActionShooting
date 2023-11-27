@@ -45,7 +45,16 @@ public:
 		{
 			return;
 		}
-		gameObject.SetDeadFlg(true);
+
+		//反射するかどうかをチェック
+		if (BoundFlg)
+		{
+			forward = gameObject.GetReflection();
+		}
+		else
+		{
+			gameObject.SetDeadFlg(true);
+		}
 	}
 
 	virtual void Update(GameObject& gameObject, float deltaTime)override
@@ -54,7 +63,7 @@ public:
 
 		//主人の正面方向に飛んでいく
 		gameObject.AddPosition(forward * MoveSpeed * deltaTime);
-
+		gameObject.SetForward(forward);
 		//5秒立ったら死ぬ
 		if (LiveTime <= 0)
 		{
@@ -82,14 +91,18 @@ public:
 	{
 		Randamness = _flg;
 	}
+
+	void SetBound(bool _bound)
+	{
+		BoundFlg = _bound;
+	}
 private:
 
 	VecMath::vec3 forward = VecMath::vec3(0,0,1);	//正面
 	float MoveSpeed = 50;	//移動速度
 	float LiveTime = 2;		//生存時間
-
 	bool Randamness = false;//弾の飛び方に乱数を加える(true=乱れる　false=まっすぐ)
-
+	bool BoundFlg = false;	//跳ね返るかどうか(true=跳ねる　false=跳ねない)
 	//乱数
 	std::random_device rd;
 	std::mt19937 RandomEngine;

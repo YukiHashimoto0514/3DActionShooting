@@ -69,6 +69,10 @@ public:
 		player = _player;
 	}
 
+	void SetMoveSpeed(float _speed)
+	{
+		MoveSpeed = _speed;
+	}
 private:
 
 	VecMath::vec3 forward = VecMath::vec3(0, 0, 1);	//ê≥ñ 

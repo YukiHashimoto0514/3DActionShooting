@@ -41,6 +41,7 @@ namespace Mesh
 		VecMath::vec4 baseColor = VecMath::vec4(1);	//基本色＋アルファ
 		float specularPower = 16;					//鏡面反射指数
 		float normalizeFactor = 24.0f / 25.13274f;	//正規化係数
+		bool receiveShadows = true;
 		TexturePtr texBaseColor;					//基本色テクスチャ
 		TexturePtr texNormal;						//法線テクスチャ
 	};

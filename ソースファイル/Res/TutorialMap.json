@@ -1,10 +1,9 @@
 [
   { "name" : "ScareCrow", "mesh" : "ScareCrow", "translate" : [ 7.4, 2.5, 266.1 ], "rotate" : [ 0, 0, 0 ], "scale" : [ 1, 1, 1 ], "tag" : "ScareCrow" },
-  { "name" : "Rock", "mesh" : "Rock", "translate" : [ -14.03, 3, 116.9 ], "rotate" : [ 0, 0, 0 ], "scale" : [ 5, 5, 8 ], "tag" : "Rock" },
   { "name" : "Ground_01", "mesh" : "Ground_01", "translate" : [ 0, 2.5, 32.9 ], "rotate" : [ 0, 0, 0 ], "scale" : [ 100, 3.71, 10 ], "tag" : "Floor" },
   { "name" : "Golden_Chest (1)", "mesh" : "Golden_Chest", "translate" : [ 16.4, 1.5, 207.76 ], "rotate" : [ 0, 270, 0 ], "scale" : [ 2, 2, 2 ], "tag" : "Treasure" },
   { "name" : "Golden_Chest", "mesh" : "Golden_Chest", "translate" : [ -25.3, 1.5, 226.3 ], "rotate" : [ 0, 90, 0 ], "scale" : [ 2, 2, 2 ], "tag" : "Treasure" },
-  { "name" : "Ground_02", "mesh" : "Ground_02", "translate" : [ 0, 0, 238.7 ], "rotate" : [ 0, 0, 0 ], "scale" : [ 100, 1, 600 ], "tag" : "Floor" },
+  { "name" : "Ground_02", "mesh" : "Ground_02", "translate" : [ 0, -1.5, 238.7 ], "rotate" : [ 0, 0, 0 ], "scale" : [ 100, 4, 600 ], "tag" : "Floor" },
   { "name" : "Ground_01 (1)", "mesh" : "Ground_01", "translate" : [ 0, 4, 71.6 ], "rotate" : [ 0, 0, 0 ], "scale" : [ 100, 7, 10 ], "tag" : "Floor" },
   { "name" : "Board", "mesh" : "Board", "translate" : [ 0, 1.148, 4.85 ], "rotate" : [ 0, 0, 0 ], "scale" : [ 2, 2, 2 ], "tag" : "Respawn" },
   { "name" : "Board (1)", "mesh" : "Board", "translate" : [ 4.904162, 4.11, 19.90105 ], "rotate" : [ 0, 321.4448, 0 ], "scale" : [ 5, 5, 2 ], "tag" : "Respawn" },

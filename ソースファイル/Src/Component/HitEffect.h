@@ -22,7 +22,7 @@ public:
 	virtual void OnTakeDamage(GameObject& gameObject, GameObject& other, const Damage& dammage)override
 	{
 
-		const float Time = std::clamp(dammage.amount, 1.0f, dammage.amount);
+		const float Time = std::clamp(dammage.amount, 1.0f, 3.0f);
 
 		//ヒットエフェクトの生成
 		auto ParticleObject = gameObject.engine->Create<GameObject>(

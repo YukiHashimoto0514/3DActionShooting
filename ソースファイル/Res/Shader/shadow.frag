@@ -15,7 +15,7 @@ struct Material
 
 	//x:‹¾–Ê”½Ëw”
 	//y:³‹K‰»ŒW”
-	vec2 specularFactor;
+	vec3 specularFactor;
 };
 layout(location = 102) uniform Material material;
 

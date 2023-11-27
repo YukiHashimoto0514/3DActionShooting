@@ -6,6 +6,7 @@
 #include "../Engine/Collision.h"
 #include "../Engine/AudioSettings.h"
 #include "../Application/Boss.h"
+#include "../Application/GameObject.h"
 #include "../Application/JumpingEnemy.h"
 #include "../Application/DeviationEnemy.h"
 #include "../Component/Warp.h"
@@ -27,7 +28,7 @@
 #include "../Component/DamageSource.h"
 #include "../Component/MegaExplosion.h"
 #include "../Component/BossExplosion.h"
-
+#include "../Component/ParticleSystem.h"
 using namespace VecMath;
 
 
@@ -44,7 +45,8 @@ bool MainGameScene::Initialize(Engine& engine)
 	
 	//ウィンドウの取得
 	window = engine.GetWindow();
-
+	
+	float windowSize = engine.GetWindowSize().x;
 	//カメラの取得
 	cameraobj = engine.GetMainCameraObject();
 	cameraobj->SetRotation({ 0,0,-1 });
@@ -53,7 +55,7 @@ bool MainGameScene::Initialize(Engine& engine)
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	//マップの読み込み
-	auto gameObjList = engine.LoadGameObjectMap("Res/mapmodel2.json", vec3(0, 0, 0), vec3(1));
+	auto gameObjList = engine.LoadGameObjectMap("Res/mapmodel.json", vec3(0, 0, 0), vec3(1));
 
 	//プレイヤーの情報
 	PlayerInit(engine);
@@ -70,27 +72,48 @@ bool MainGameScene::Initialize(Engine& engine)
 	//ワープ（マップ作成中）
 	{
 		//ワープの数（２個１）
-		//const int WarpCount = 2;
+		const int WarpCount = 1;
 
-		////ワープの設定
-		//for (int i = 0; i < WarpCount; ++i)
-		//{
-		//	//数字を文字列に変換
-		//	std::string No = std::to_string(i);
-		//	std::string EnterName = "WarpEnter";	//入り口の名前
-		//	std::string ExitName = "WarpExit";		//出口の名前
+		//ワープの設定
+		for (int i = 0; i < WarpCount; ++i)
+		{
+			//数字を文字列に変換
+			std::string No = std::to_string(i);
+			std::string EnterName = "WarpEnter";	//入り口の名前
+			std::string ExitName = "WarpExit";		//出口の名前
 
-		//	//合体
-		//	EnterName += No;
-		//	ExitName += No;
+			//合体
+			EnterName += No;
+			ExitName += No;
 
-		//	//ワープオブジェを検索し、対応させる
-		//	auto warp = engine.SearchGameObject(EnterName);
-		//	auto exit = engine.SearchGameObject(ExitName);
-		//	auto enter = warp->AddComponent<Warp>();
-		//	enter->SetExit(exit);
+			//ワープオブジェを検索し、対応させる
+			auto warp = engine.SearchGameObject(EnterName);
+			auto exit = engine.SearchGameObject(ExitName);
+			auto enter = warp->AddComponent<Warp>();
+			enter->SetExit(exit);
 
-		//}
+			auto ParticleObject = engine.Create<GameObject>(
+				"particle explosion", warp->GetPos());
+
+			
+			auto ps = ParticleObject->AddComponent<ParticleSystem>();
+			ps->Emitters.resize(1);
+			auto& emitter = ps->Emitters[0];
+			emitter.ep.ImagePath = "Res/UI/Last.tga";
+
+			emitter.ep.RandomizeRotation = 1;		//角度をつける
+			emitter.ep.RandomizeDirection = 1;
+			emitter.ep.RandomizeSize = 1;			//大きさをランダムに
+			emitter.ep.Duration = 0.1f;				//放出時間
+			emitter.ep.EmissionsPerSecond = 100;	//秒間放出数
+
+			emitter.pp.LifeTime = 0.4f;				//生存時間
+			emitter.pp.color.Set({ 5, 1, 5.5f, 1 }, { 1, 2, 1.5f, 0 });	//色付け
+			emitter.pp.scale.Set({ 0.3f,0.1f }, { 0.05f,0.02f });	//サイズを徐々にへ変更させる
+
+			emitter.ep.Loop = true;
+
+		}
 	}
 
 	//画面の中心にエイムを表示
@@ -98,6 +121,12 @@ bool MainGameScene::Initialize(Engine& engine)
 	uimouce = engine.CreateUI<GameObject>(mouce, "aim", 367, 50);
 	uimouce->AddSprite({ 0,0,1,1 });
 	uimouce->SetPos(vec3(640, 360, 0)); 
+
+	//ボス出現UI
+	size_t bossUI = engine.AddUILayer("Res/UI/BossUI.tga", GL_LINEAR, 10);
+	BossUI = engine.CreateUI<GameObject>(bossUI, "aim", 300, 500);
+	BossUI->AddSprite({ 0,0,1,1 });
+	BossUI->SetPos(vec3(windowSize * 0.5f, 680, 0));
 
 	//フェードインをする
 	engine.SetFadeRule("Res/Fade/fade_rule3.tga");
@@ -179,16 +208,34 @@ bool MainGameScene::Initialize(Engine& engine)
 	size_t HPFrameImg = engine.AddUILayer("Res/UI/HPFrame.tga", GL_LINEAR, 10);
 	GameObjectPtr HPFrame = engine.CreateUI<GameObject>(HPFrameImg, "hpframe", 0, 500);
 	HPFrame->AddSprite({ 0,0,1,1 });
-	HPFrame->SetPos(vec3{ 230,650,0 });
+	HPFrame->SetPos(vec3{ 220,650,0 });
+
+	size_t MuscleImg = engine.AddUILayer("Res/UI/Mashule.tga", GL_LINEAR, 10);
+	GameObjectPtr Muscle = engine.CreateUI<GameObject>(MuscleImg, "hpframe", 0, 500);
+	Muscle->AddSprite({ 0,0,1,1 });
+	Muscle->SetPos(vec3{ 1020,650,0 });
 
 
 	//フォント画像
 	const size_t textLayer = engine.AddUILayer("Res/UI/font_04_2.tga", GL_NEAREST, 10);
 
 	//制限時間UI
-	auto uiTime = engine.CreateUI<GameObject>(textLayer, "time", 940, 600);
+	auto uiTime = engine.CreateUI<GameObject>(textLayer, "time", 540, 600);
 	TimeManager = uiTime->AddComponent<TimeLimit>();
 	TimeManager->SetTextComponent(uiTime->AddComponent<Text>());	//テキストコンポーネントを入れる
+
+	//PowerUPUI
+	auto uistate = engine.CreateUI<GameObject>(textLayer, "state", 540, 600);
+	StateManager[0] = uistate->AddComponent<StateUI>();
+	StateManager[0]->SetTextComponent(uistate->AddComponent<Text>());	//テキストコンポーネントを入れる
+	uistate->SetPos({ 885,615,0 });
+
+	//SpeedUPUI
+	auto uispeed = engine.CreateUI<GameObject>(textLayer, "state", 540, 600);
+	StateManager[1] = uispeed->AddComponent<StateUI>();
+	StateManager[1]->SetState(1);
+	StateManager[1]->SetTextComponent(uispeed->AddComponent<Text>());	//テキストコンポーネントを入れる
+	uispeed->SetPos({ 1100,615,0 });
 	
 	//落下した時の床作成
 	auto UnderGround = engine.Create<GameObject>("Ground");		
@@ -229,7 +276,7 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 			auto CapsuleRenderer2 = BossObj->AddComponent<MeshRenderer>();
 			CapsuleRenderer2->mesh = engine.LoadOBJ("Capsule2");
 			CapsuleRenderer2->scale = vec3(2);
-			BossObj->SetHP(1);
+			BossObj->SetHP(180);
 			
 			auto ex = BossObj->AddComponent<BossExplosion>();
 
@@ -256,6 +303,8 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 			//ボスの出現を知らせるフラグ
 			BossShow = true;
 		}
+
+		BossUI->SetDeadFlg(true);
 	}
 	else	//制限時間を減らしていく
 	{
@@ -539,6 +588,9 @@ void MainGameScene::UIUpdate()
 	//一番左の定位置
 	vec3 Pos = vec3{ 70,546,0 };
 
+	StateManager[0]->SetLv(PlayerObj->GetShotDamage());
+	StateManager[1]->SetLv(PlayerObj->GetMoveSpeed());
+	
 	const float NormalSize = 1.0f;	//通常サイズ
 	const float MinimamSize = 0.6f;	//小さいサイズ
 

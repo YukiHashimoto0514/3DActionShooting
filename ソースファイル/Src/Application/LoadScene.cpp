@@ -125,7 +125,7 @@ void LoadScene::Update(Engine& engine, float deltaTime)
 		{
 			if (!Push)
 			{
-				Audio::PlayOneShot(SE::Click2, 0.2f);		//効果音を再生
+				Audio::PlayOneShot(SE::enemyExplosionD, 0.5f);		//効果音を再生
 				engine.SetFadeRule("Res/Fade/fade_rule3.tga");
 				engine.StartFadeOut();	//フェードをする
 				Push = true;

@@ -106,6 +106,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)Src\glad\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -138,6 +139,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)Src\glad\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -148,18 +150,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Res\fade.frag" />
-    <None Include="Res\gaussian_blur.frag" />
-    <None Include="Res\high_pass_filter.frag" />
-    <None Include="Res\particle.frag" />
-    <None Include="Res\particle.vert" />
-    <None Include="Res\skybox.vert" />
-    <None Include="Res\shadow.frag" />
-    <None Include="Res\shadow.vert" />
-    <None Include="Res\skybox.frag" />
-    <None Include="Res\standard_3D.frag" />
-    <None Include="Res\standard_3D.vert" />
-    <None Include="Res\up_sampling.frag" />
+    <None Include="Res\Shader\down_sampling.frag" />
+    <None Include="Res\Shader\fade.frag" />
+    <None Include="Res\Shader\gaussian_blur.frag" />
+    <None Include="Res\Shader\high_pass_filter.frag" />
+    <None Include="Res\Shader\particle.frag" />
+    <None Include="Res\Shader\particle.vert" />
+    <None Include="Res\Shader\shadow.frag" />
+    <None Include="Res\Shader\shadow.vert" />
+    <None Include="Res\Shader\simple_2D.vert" />
+    <None Include="Res\Shader\skybox.frag" />
+    <None Include="Res\Shader\skybox.vert" />
+    <None Include="Res\Shader\standard_2D.frag" />
+    <None Include="Res\Shader\standard_2D.vert" />
+    <None Include="Res\Shader\standard_3D.frag" />
+    <None Include="Res\Shader\standard_3D.vert" />
+    <None Include="Res\Shader\up_sampling.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Application\Boss.cpp" />
@@ -207,6 +213,7 @@
     <ClInclude Include="Src\Component\BulletMove.h" />
     <ClInclude Include="Src\Component\Chase.h" />
     <ClInclude Include="Src\Component\EnemyBulletMove.h" />
+    <ClInclude Include="Src\Component\Fall.h" />
     <ClInclude Include="Src\Component\FallFloor.h" />
     <ClInclude Include="Src\Component\FloatText.h" />
     <ClInclude Include="Src\Component\Goal.h" />
@@ -215,6 +222,7 @@
     <ClInclude Include="Src\Component\Player.h" />
     <ClInclude Include="Src\Component\DropPowerUp.h" />
     <ClInclude Include="Src\Component\RedHPBar.h" />
+    <ClInclude Include="Src\Component\StateUI.h" />
     <ClInclude Include="Src\Component\TextMove.h" />
     <ClInclude Include="Src\Component\TimeLimit.h" />
     <ClInclude Include="Src\Component\TreasureBox.h" />

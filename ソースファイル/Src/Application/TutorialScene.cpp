@@ -68,7 +68,7 @@ bool TutorialScene::Initialize(Engine& engine)
 		CapsuleRenderer->scale.z });
 
 	//ˆÊ’u‚ð’²®
-	PlayerObj->SetPos({ 0,10,0 });
+	PlayerObj->SetPos({ 0,15,0 });
 	PlayerObj->SetRotation({ 0, 0, 0 });
 
 	cameraobj->SetRotation({ 0,radians(180),0 });
