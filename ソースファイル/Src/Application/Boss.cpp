@@ -490,11 +490,13 @@ void Boss::ChangeState(Routine _state)
 		TakeTime = 0;
 		break;
 	case Routine::MoveRndPos:
-	{
-		const float x = std::uniform_real_distribution<float>(-100, 100)(engine->GetRandomGenerator());//-200~200
-		const float z = std::uniform_real_distribution<float>(-100, 100)(engine->GetRandomGenerator());//-200~200
+	{		
+		vec3 pos= player->GetPos();
+		pos.x *= -1;
+		pos.z *= -1;
 
-		targetPos = vec3{ x,0,z };
+		//ƒvƒŒƒCƒ„[‚ÌŒã‚ë‚ÉˆÚ“®
+		targetPos = vec3{ pos };
 		beforePos = this->GetPos();
 
 		MoveTimer = 0;

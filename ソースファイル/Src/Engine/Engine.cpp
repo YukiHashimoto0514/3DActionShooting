@@ -114,7 +114,6 @@ struct WorldCollider
 					//反射ベクトルを計算し、代入
 					vec3 reflection = -dot(other.gameObject->GetForward(), -cp.Normal) * -cp.Normal * 2 + other.gameObject->GetForward();
 					
-					LOG("%f,%f,%f", reflection.x, reflection.y, reflection.z);
 					other.gameObject->SetRef(reflection);
 					continue;
 				}
@@ -492,6 +491,15 @@ GameObjectList Engine::LoadGameObjectMap(const char* filename,
 			auto ee = gameObject->AddComponent<Explosion>();	//爆発
 
 		}
+		else if (Tag == "EnemySpawn")
+		{
+			std::string Name = name;
+			gameObject->name = Name;
+
+			//auto spawn = gameObject->AddComponent<DeviationSpawn>();
+		}
+
+ 
 		//ゲームオブジェクトを追加
 		gameObjectList.push_back(gameObject);
 	}

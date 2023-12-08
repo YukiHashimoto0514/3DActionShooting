@@ -64,11 +64,12 @@ private:
 	double oldX = 0;	//マウスの昔の位置
 	double oldY = 0;	//マウスの昔の位置
 
-	float EnemyCreate = 0;	//エネミーを生成するクールタイム
-	float LimitTime = 150;	//残り時間
+	float EnemyCreate = 0;		//エネミーを生成するクールタイム
+	float LimitTime = 150;		//残り時間
 
 	const float UIMARGINE = 150.0f;	//UI画像の幅
 
+	const static int SpownCount = 2;
 	bool BossShow = false;//ボスが出現する(true=出現　false=未出現) 
 
 };

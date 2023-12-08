@@ -43,18 +43,19 @@ public:
 private:
 
 	//正面方向を計算して設定する
-	void CalcForward();
+	void CalcForward(vec3 target);
 
 	//偏差撃ちの距離を計算する
 	void AddDeviation();
 
+	void RandomMove(float deltaTime);
 	//止まる
 	bool Wait(float deltaTime);
 
 	//ステートを変える
 	void ChangeState(State nextstate);
 
-	const float CHASETIME = 3.0f;	//追跡する時間
+	const float CHASETIME = 5.0f;	//追跡する時間
 	const float CHARGETIME = 1.0f;	//止まって射撃するまでの時間
 	const float SHOTWAIT  = 0.4f;	//射撃待機時間間隔
 	const float CHASEWAIT = 0.5f;	//射撃後の移動を開始するまでの時間
@@ -64,8 +65,10 @@ private:
 	bool OnceFlg = false;	//一度だけ通ってほしいフラグ
 
 	float MoveTimer = 0;	//何秒移動したかを記録する
+	float WaitTime = 0;		//どのくらい止まっているかを測る
+	vec3 RandomPos = vec3(0);		//ランダムな移動先
 
-	State state = State::eStop;
+	State state = State::eChase;
 };
 
 

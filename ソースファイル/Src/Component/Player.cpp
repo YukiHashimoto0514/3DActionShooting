@@ -37,16 +37,6 @@ void Player::Update(float deltaTime)
 		this->SetImmortalTime(0);
 	}
 
-	//~~ŽGŽÀ‘•~~\\
-	
-	if (engine->GetKey(GLFW_KEY_LEFT_SHIFT))
-	{
-		engine->SlowSpeed = 0.5f;
-	}
-	else
-	{
-		engine->SlowSpeed = 1.0f;
-	}
 
 	//’ÊíUŒ‚‚É‚·‚é
 	if (engine->GetKey(GLFW_KEY_1))
@@ -303,8 +293,6 @@ void Player::Shot(float deltaTime)
 				da->targetName = "enemy";
 				da->amount = ShotDamage * 0.5f;	//ƒ_ƒ[ƒW‚ð’²®
 				da->isOnce = true;
-
-
 			}
 
 			//ŽËŒ‚‰¹‚ð–Â‚ç‚·
@@ -321,8 +309,6 @@ void Player::Shot(float deltaTime)
 
 void Player::Fall(float deltaTime)
 {
-
-
 	//‹ó’†‚È‚ç
 	if (this->GetAir())
 	{

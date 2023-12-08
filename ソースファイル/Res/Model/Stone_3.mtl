@@ -1,0 +1,5 @@
+newmtl M_Rock_05
+map_Kd T_Rock_05_D.tga
+map_Bump T_Rock_05_N.tga
+illum 2
+

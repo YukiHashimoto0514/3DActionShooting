@@ -28,6 +28,7 @@
 #include "../Component/DamageSource.h"
 #include "../Component/MegaExplosion.h"
 #include "../Component/BossExplosion.h"
+#include "../Component/DeviationSpawn.h"
 #include "../Component/ParticleSystem.h"
 using namespace VecMath;
 
@@ -249,6 +250,18 @@ bool MainGameScene::Initialize(Engine& engine)
 
 	auto fall = UnderGround->AddComponent<UnderBorder>();
 
+	//敵のスポーンポイントの設定
+	for (int i = 0; i < SpownCount; ++i)
+	{
+		std::string No = std::to_string(i);
+		std::string Name = "SpawnPoint";	//入り口の名前
+		Name += No;
+		auto obj = engine.SearchGameObject(Name);
+
+		auto spawn = obj->AddComponent<DeviationSpawn>();
+		spawn->SetPlayer(PlayerObj);
+	}
+
 	//BGMを再生
 	Audio::Play(AudioPlayer::bgm, BGM::stage01, 1, true);
 
@@ -320,7 +333,7 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 	PlayerUpdate(engine, PlayerObj, deltaTime);
 
 	//カメラをプレイヤーに合わせる
-	cameraobj->SetPos({ PlayerObj->GetPos().x,PlayerObj->GetPos().y+0.5f,PlayerObj->GetPos().z });
+	cameraobj->SetPos({ PlayerObj->GetPos().x,PlayerObj->GetPos().y + 0.5f,PlayerObj->GetPos().z });
 
 	//cameraobj->SetPos(PlayerObj->GetPos() - PlayerObj->GetForward() * 2);
 	//ｙ軸を合わせる
@@ -334,12 +347,12 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 	}
 
 	//エネミーを生成するクールタイム
-	EnemyCreate += deltaTime;
+	EnemyCreate -= deltaTime;
 
-	//残り時間が少ない程大量に生成される
-	if (EnemyCreate >= LimitTime * 0.08f)
+	//ランダムな時間で生成される
+	if (EnemyCreate <= 0)
 	{
-		EnemyCreate = 0;
+		EnemyCreate = std::uniform_real_distribution<float>(5, 20)(engine.GetRandomGenerator());
 
 		//乱数の生成
 		const int rand = std::uniform_int_distribution<>(0, 100)(engine.GetRandomGenerator());//0~100
@@ -383,60 +396,13 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 				kingRenderer->scale.x,
 				kingRenderer->scale.y,
 				kingRenderer->scale.z });
-
+			
 			auto he = king->AddComponent<HitEffect>();	//エフェクト
 			auto hh = king->AddComponent<Health>();		//HP
 			auto ee = king->AddComponent<Explosion>();	//爆発
 			auto dp = king->AddComponent<DropPowerUp>();//アイテム
 			dp->target = PlayerObj;
 			dp->KingFlg = true;
-		}
-		else if (rand >= 50)//偏差撃ちをする敵
-		{
-			auto ene = engine.Create<DeviationEnemy>("enemy");
-			ene->SetTarget(PlayerObj);
-
-			//ｈPの設定
-			const float hp = std::uniform_real_distribution<float>(2, 4)(engine.GetRandomGenerator());//2~4
-			ene->SetHP(hp);
-
-			//モデル読み込み
-			auto eneRenderer = ene->AddComponent<MeshRenderer>();
-			eneRenderer->mesh = engine.LoadOBJ("Res/Model/Drone_01.obj");
-			eneRenderer->scale = vec3(1);
-
-			//スポーン位置
-			const float x = std::uniform_real_distribution<float>(-100, 100)(engine.GetRandomGenerator());//-100~100
-			const float z = std::uniform_real_distribution<float>(-100, 100)(engine.GetRandomGenerator());//-100~100
-			ene->SetPos(vec3(x, 1, z));
-
-			//個別に色を変えるために、マテリアルをコピー
-			for (const auto& e : eneRenderer->mesh->materials) {
-				eneRenderer->materials.push_back(
-					std::make_shared<Mesh::Material>(*e));
-			}
-
-			//本体の色を変える
-			const float r = std::uniform_real_distribution<float>(0, 1)(engine.GetRandomGenerator());//0~1
-			const float g = std::uniform_real_distribution<float>(0, 1)(engine.GetRandomGenerator());//0~1
-			const float b = std::uniform_real_distribution<float>(0, 1)(engine.GetRandomGenerator());//0~1
-			eneRenderer->materials[0]->baseColor = vec4(r, g, b, 1);
-
-
-			//コライダーを割り当てる
-			auto enecollider = ene->AddComponent<SphereCollider>();
-			enecollider->sphere.Center = eneRenderer->translate;
-			enecollider->sphere.Radius = std::max({
-				eneRenderer->scale.x,
-				eneRenderer->scale.y,
-				eneRenderer->scale.z });
-
-
-			auto he = ene->AddComponent<HitEffect>();	//エフェクト
-			auto hh = ene->AddComponent<Health>();		//HP
-			auto ee = ene->AddComponent<Explosion>();	//爆発
-			auto dp = ene->AddComponent<DropPowerUp>();	//アイテム
-			dp->target = PlayerObj;
 		}
 		else//スライム
 		{
@@ -455,7 +421,7 @@ void MainGameScene::Update(Engine& engine,float deltaTime)
 			//スポーン位置
 			const float x = std::uniform_real_distribution<float>(-100, 100)(engine.GetRandomGenerator());//-100~100
 			const float z = std::uniform_real_distribution<float>(-100, 100)(engine.GetRandomGenerator());//-100~100
-			ene->SetPos(vec3(x, 1, z));
+			ene->SetPos(vec3(x, 100, z));
 
 			//個別に色を変えるために、マテリアルをコピー
 			for (const auto& e : eneRenderer->mesh->materials) {

@@ -2,6 +2,8 @@
 #include "../Engine/AudioSettings.h"
 #include "EasyAudio.h"
 #include "../Component/FloatText.h"
+
+
 void ItemObject::OnCollision(GameObject& object)
 {
 	//フォント画像
@@ -102,5 +104,4 @@ void ItemObject::OnCollision(GameObject& object)
 		//オブジェの破棄
 		this->SetDeadFlg(true);
 	}
-
 }

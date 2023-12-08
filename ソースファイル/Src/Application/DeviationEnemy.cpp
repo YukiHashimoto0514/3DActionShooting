@@ -10,6 +10,7 @@ void DeviationEnemy::Update(float deltaTime)
 	switch (state)
 	{
 	case State::eChase:
+	{
 		MoveTimer += deltaTime;
 
 		//次のステートに移行
@@ -18,13 +19,36 @@ void DeviationEnemy::Update(float deltaTime)
 			ChangeState(State::eStop);
 		}
 
-		//正面方向を向く
-		CalcForward();
+		static const float MINDISTANCE = 10.0f;	//プレイヤーとの最小距離
+		static const float MAXDISTANCE = 80.0f;	//プレイヤーとの最大距離
 
-		//移動する
-		Move(deltaTime);
+		//プレイヤーの距離を計算
+		float dx = target->GetPos().x - this->GetPos().x;
+		float dy = target->GetPos().z - this->GetPos().z;
+		const float distance = sqrt(dx * dx + dy * dy);
+
+		//一定以内の距離だったら
+		if (distance >= MINDISTANCE && distance <= MAXDISTANCE)
+		{
+			//プレイヤーの方向に移動
+			Move(deltaTime);
+		}
+		//距離が既定値より小さかったら
+		else if (distance <= MINDISTANCE)
+		{
+			//正面方向を向く
+			CalcForward(target->GetPos());
+
+			//次の行動までの時間を加速させる
+			MoveTimer += deltaTime;
+		}
+		else
+		{
+			RandomMove(deltaTime);
+		}
+
 		break;
-
+	}
 	case State::eStop:
 		MoveTimer += deltaTime;
 
@@ -36,7 +60,7 @@ void DeviationEnemy::Update(float deltaTime)
 		}
 
 		//正面を計算
-		CalcForward();
+		CalcForward(target->GetPos());
 
 		break;
 	case State::eShotWait:
@@ -77,33 +101,11 @@ void DeviationEnemy::Update(float deltaTime)
 
 void DeviationEnemy::Move(float deltaTime)
 {
-	static const float DISTANCE = 20.0f;	//プレイヤーとの距離
+	//正面方向を向く
+	CalcForward(target->GetPos());
 
-
-	float dx = target->GetPos().x - this->GetPos().x;
-	float dy = target->GetPos().z - this->GetPos().z;
-
-	//ターゲットが指定されていなかったら
-	if (target == NULL)
-	{
-		this->SetPos(this->GetPos() + vec3(0, 1, 0) * deltaTime);
-
-		return;
-	}
-	//距離が既定値に達していたら
-	else if (sqrt(dx* dx + dy* dy) <= DISTANCE)
-	{
-		//次の行動までの時間を加速させる
-		MoveTimer += deltaTime;
-		return;
-	}
-	//距離がある程度離れていたら詰める
-	else
-	{
-		//正面に移動
-		this->AddPosition(this->GetForward() * deltaTime * 5);
-	}
-
+	//正面に移動
+	this->AddPosition(this->GetForward() * deltaTime * 5);
 }
 
 void DeviationEnemy::Shot(float deltaTime)
@@ -146,10 +148,10 @@ void DeviationEnemy::Shot(float deltaTime)
 
 }
 
-void DeviationEnemy::CalcForward()
+void DeviationEnemy::CalcForward(vec3 target)
 {
 	//向きベクトルを取得
-	vec3 Forward = this->GetPos() - target->GetPos();
+	vec3 Forward = this->GetPos() - target;
 
 	//反転
 	Forward *= vec3(-1);
@@ -217,6 +219,38 @@ void DeviationEnemy::AddDeviation()
 	MoveTimer = 1.5f;
 }
 
+void DeviationEnemy::RandomMove(float deltaTime)
+{
+	//一回だけ入る
+	if (!OnceFlg)
+	{
+		//ランダムの位置を生成
+		const float x = std::uniform_real_distribution<float>(-10, 10)(engine->GetRandomGenerator());//-10~10
+		const float z = std::uniform_real_distribution<float>(-10, 10)(engine->GetRandomGenerator());//-10~10
+		RandomPos = { this->GetPos().x + x,this->GetPos().y,this->GetPos().z + z };
+		OnceFlg = true;
+	}
+	CalcForward(RandomPos);
+
+	//向いている方向に移動
+	this->AddPosition(this->GetForward() * deltaTime * 5);
+	MoveTimer -= deltaTime;		//攻撃に移行しない
+	WaitTime += deltaTime;		//待機時間を追加
+
+	//座標に到着したら、もう一度移動
+	if (this->GetPos().x - RandomPos.x < 1 && this->GetPos().z - RandomPos.z < 1)
+	{
+		ChangeState(State::eChaseWait);
+	}
+
+	//範囲外の目標に走り続けた場合
+	if (WaitTime >= CHASETIME)
+	{
+		//次に移動
+		ChangeState(State::eChaseWait);
+	}
+}
+
 bool DeviationEnemy::Wait(float deltaTime)
 {
 	MoveTimer -= deltaTime;
@@ -244,6 +278,9 @@ void DeviationEnemy::ChangeState(State nextstate)
 	{
 		//待機時間を設定する
 		MoveTimer = CHASEWAIT;
+		WaitTime = 0;
+		OnceFlg = false;
+
 	}
 	else
 	{

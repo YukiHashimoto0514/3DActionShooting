@@ -212,6 +212,7 @@
     <ClInclude Include="Src\Component\BossExplosion.h" />
     <ClInclude Include="Src\Component\BulletMove.h" />
     <ClInclude Include="Src\Component\Chase.h" />
+    <ClInclude Include="Src\Component\DeviationSpawn.h" />
     <ClInclude Include="Src\Component\EnemyBulletMove.h" />
     <ClInclude Include="Src\Component\Fall.h" />
     <ClInclude Include="Src\Component\FallFloor.h" />
